@@ -27,7 +27,7 @@ type LanguageType struct {
 }
 
 type StateType struct {
-	State string `json:state`
+	State string `json:"state"`
 	Code  string `json:"code"`
 }
 

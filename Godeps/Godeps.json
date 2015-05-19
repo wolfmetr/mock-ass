@@ -1,0 +1,27 @@
+{
+	"ImportPath": "github.com/wolfmetr/mock-ass",
+	"GoVersion": "go1.4",
+	"Deps": [
+		{
+			"ImportPath": "github.com/fatih/color",
+			"Rev": "191595cfb2ec9522680470397712a174a5684bb5"
+		},
+		{
+			"ImportPath": "github.com/golang/glog",
+			"Rev": "44145f04b68cf362d9c4df2182967c2275eaefed"
+		},
+		{
+			"ImportPath": "github.com/pmylund/go-cache",
+			"Rev": "93d85800f2fa6bd0a739e7bd612bfa3bc008b72d"
+		},
+		{
+			"ImportPath": "github.com/shiena/ansicolor",
+			"Rev": "8368d3b31cf6f2c2464c7a91675342c9a0ac6658"
+		},
+		{
+			"ImportPath": "gopkg.in/flosch/pongo2.v3",
+			"Comment": "v3.0",
+			"Rev": "5e81b817a0c48c1c57cdf1a9056cf76bdee02ca9"
+		}
+	]
+}
