@@ -107,6 +107,10 @@ If you send GET request to `http://localhost:8000/session/?s=...&h=...` you'll g
 ## Template variables
 - hash — unique hash for request
 
+## Task list
+- [ ] Tests
+- [ ] Function `OneFromList` for return random item from args
+
 ## Contact
 
 - Vladimir Savvateev
