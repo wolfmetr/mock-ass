@@ -185,4 +185,5 @@ func InitWithDefaults() {
 	LoadFemaleNames()
 	LoadMaleNames()
 	LoadEmailDomains()
+	LoadParagraphs()
 }
