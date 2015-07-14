@@ -106,6 +106,9 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 				}
 				LocalCache.Set("ct_"+session_uuid, content_type, cache_data_ttl_td)
 				w.Header().Set("Content-Type", content_type.(string))
+				w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Origin", "*")
 				io.WriteString(w, result.(string))
 				return http.StatusOK
 			}
@@ -128,6 +131,9 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 				q.Set("h", hash)
 				url_redirect.RawQuery = q.Encode()
 				w.Header().Set("Location", url_redirect.String())
+				w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Origin", "*")
 				w.WriteHeader(http.StatusTemporaryRedirect)
 				return http.StatusTemporaryRedirect
 			}
@@ -137,6 +143,9 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 			}
 			LocalCache.Set("ct_"+session_uuid, content_type, cache_data_ttl_td)
 			w.Header().Set("Content-Type", content_type.(string))
+			w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
 			io.WriteString(w, out)
 			return http.StatusOK
 		} else {
@@ -158,7 +167,16 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 			return http.StatusInternalServerError
 		}
 		w.Header().Set("Content-Type", content_type)
+		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		io.WriteString(w, out)
+		return http.StatusOK
+	} else if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		io.WriteString(w, "")
 		return http.StatusOK
 	}
 	w.WriteHeader(http.StatusMethodNotAllowed)
