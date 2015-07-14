@@ -10,7 +10,7 @@ $ go get github.com/wolfmetr/mock-ass
 ```bash
 $ make run
 or
-$ ./mock-ass [-no-color] [-port=8000] 
+$ ./mock-ass [-color] [-port=8000] 
 ```
 
 to initialize session send POST request to `http://localhost:8000/init` with media-type `application/x-www-form-urlencoded`
