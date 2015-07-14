@@ -227,11 +227,11 @@ func get_session(w http.ResponseWriter, r *http.Request) int {
 }
 
 func main() {
-	flagNoColor := flag.Bool("no-color", false, "Disable color output")
-	port := flag.Int("port", 8000, "Server start port")
+	flagColor := flag.Bool("color", false, "enable color output")
+	port := flag.Int("port", 8000, "server start port")
 	flag.Lookup("logtostderr").Value.Set("true")
 	flag.Parse()
-	if *flagNoColor {
+	if *flagColor == false {
 		color.NoColor = true
 	}
 
