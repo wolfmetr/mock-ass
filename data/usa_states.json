@@ -1,0 +1,206 @@
+[
+	{
+		"code": "AK",
+		"state": "ALASKA"
+	},
+	{
+		"code": "AL",
+		"state": "ALABAMA"
+	},
+	{
+		"code": "AR",
+		"state": "ARKANSAS"
+	},
+	{
+		"code": "AZ",
+		"state": "ARIZONA"
+	},
+	{
+		"code": "CA",
+		"state": "CALIFORNIA"
+	},
+	{
+		"code": "CO",
+		"state": "COLORADO"
+	},
+	{
+		"code": "CT",
+		"state": "CONNECTICUT"
+	},
+	{
+		"code": "DC",
+		"state": "DISTRICT OF COLUMBIA"
+	},
+	{
+		"code": "DE",
+		"state": "DELAWARE"
+	},
+	{
+		"code": "FL",
+		"state": "FLORIDA"
+	},
+	{
+		"code": "GA",
+		"state": "GEORGIA"
+	},
+	{
+		"code": "HI",
+		"state": "HAWAII"
+	},
+	{
+		"code": "IA",
+		"state": "IOWA"
+	},
+	{
+		"code": "ID",
+		"state": "IDAHO"
+	},
+	{
+		"code": "IL",
+		"state": "ILLINOIS"
+	},
+	{
+		"code": "IN",
+		"state": "INDIANA"
+	},
+	{
+		"code": "KS",
+		"state": "KANSAS"
+	},
+	{
+		"code": "KY",
+		"state": "KENTUCKY"
+	},
+	{
+		"code": "LA",
+		"state": "LOUISIANA"
+	},
+	{
+		"code": "MA",
+		"state": "MASSACHUSETTS"
+	},
+	{
+		"code": "MD",
+		"state": "MARYLAND"
+	},
+	{
+		"code": "ME",
+		"state": "MAINE"
+	},
+	{
+		"code": "MI",
+		"state": "MICHIGAN"
+	},
+	{
+		"code": "MN",
+		"state": "MINNESOTA"
+	},
+	{
+		"code": "MO",
+		"state": "MISSOURI"
+	},
+	{
+		"code": "MS",
+		"state": "MISSISSIPPI"
+	},
+	{
+		"code": "MT",
+		"state": "MONTANA"
+	},
+	{
+		"code": "NC",
+		"state": "NORTH CAROLINA"
+	},
+	{
+		"code": "ND",
+		"state": "North Dakato"
+	},
+	{
+		"code": "NE",
+		"state": "NEBRASKA"
+	},
+	{
+		"code": "NH",
+		"state": "NEW HAMPSHIRE"
+	},
+	{
+		"code": "NJ",
+		"state": "NEW JERSEY"
+	},
+	{
+		"code": "NM",
+		"state": "NEW MEXICO"
+	},
+	{
+		"code": "NV",
+		"state": "NEVADA"
+	},
+	{
+		"code": "NY",
+		"state": "NEW YORK"
+	},
+	{
+		"code": "OH",
+		"state": "OHIO"
+	},
+	{
+		"code": "OK",
+		"state": "OKLAHOMA"
+	},
+	{
+		"code": "OR",
+		"state": "OREGON"
+	},
+	{
+		"code": "PA",
+		"state": "PENNSYLVANIA"
+	},
+	{
+		"code": "RI",
+		"state": "RHODE ISLAND"
+	},
+	{
+		"code": "SC",
+		"state": "SOUTH CAROLINA"
+	},
+	{
+		"code": "SD",
+		"state": "South Dakato"
+	},
+	{
+		"code": "TN",
+		"state": "TENNESSEE"
+	},
+	{
+		"code": "TX",
+		"state": "TEXAS"
+	},
+	{
+		"code": "UT",
+		"state": "UTAH"
+	},
+	{
+		"code": "VA",
+		"state": "VIRGINIA"
+	},
+	{
+		"code": "VT",
+		"state": "VERMONT"
+	},
+	{
+		"code": "WA",
+		"state": "WASHINGTON"
+	},
+	{
+		"code": "WI",
+		"state": "WISCONSIN"
+	},
+	{
+		"code": "WV",
+		"state": "WEST VIRGINIA"
+	},
+	{
+		"code": "WY",
+		"state": "WYOMING"
+	}
+]

@@ -41,6 +41,15 @@ var LastNames []string
 var EmailDomains []string
 var Paragraphs []string
 
+func GetDataDir() string {
+	data_path := os.Getenv("MOCK_ASS_DATA_DIR")
+	if data_path == "" {
+		glog.Error(color.RedString("Environment variable MOCK ASS_DATA_DIR is empty"))
+		os.Exit(1)
+	}
+	return data_path
+}
+
 func LoadCountriesFromFile(file_path string) {
 	glog.Info(color.BlueString("Load countries from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
@@ -55,7 +64,7 @@ func LoadCountriesFromFile(file_path string) {
 }
 
 func LoadCountries() {
-	LoadCountriesFromFile("./data/countries.json")
+	LoadCountriesFromFile(GetDataDir() + "/countries.json")
 }
 
 func LoadLanguagesFromFile(file_path string) {
@@ -72,7 +81,7 @@ func LoadLanguagesFromFile(file_path string) {
 }
 
 func LoadLanguages() {
-	LoadLanguagesFromFile("./data/languages.json")
+	LoadLanguagesFromFile(GetDataDir() + "/languages.json")
 }
 
 func LoadStatesFromFile(file_path string) {
@@ -89,7 +98,7 @@ func LoadStatesFromFile(file_path string) {
 }
 
 func LoadStates() {
-	LoadStatesFromFile("./data/usa_states.json")
+	LoadStatesFromFile(GetDataDir() + "/usa_states.json")
 }
 
 func LoadFemaleNamesFromFile(file_path string) {
@@ -106,7 +115,7 @@ func LoadFemaleNamesFromFile(file_path string) {
 }
 
 func LoadFemaleNames() {
-	LoadFemaleNamesFromFile("./data/female_names.json")
+	LoadFemaleNamesFromFile(GetDataDir() + "/female_names.json")
 }
 
 func LoadMaleNamesFromFile(file_path string) {
@@ -123,7 +132,7 @@ func LoadMaleNamesFromFile(file_path string) {
 }
 
 func LoadMaleNames() {
-	LoadMaleNamesFromFile("./data/male_names.json")
+	LoadMaleNamesFromFile(GetDataDir() + "/male_names.json")
 }
 
 func LoadLastNamesFromFile(file_path string) {
@@ -140,7 +149,7 @@ func LoadLastNamesFromFile(file_path string) {
 }
 
 func LoadLastNames() {
-	LoadLastNamesFromFile("./data/last_names.json")
+	LoadLastNamesFromFile(GetDataDir() + "/last_names.json")
 }
 
 func LoadEmailDomainsFromFile(file_path string) {
@@ -157,7 +166,7 @@ func LoadEmailDomainsFromFile(file_path string) {
 }
 
 func LoadEmailDomains() {
-	LoadEmailDomainsFromFile("./data/email_domains.json")
+	LoadEmailDomainsFromFile(GetDataDir() + "/email_domains.json")
 }
 
 func LoadParagraphsFromFile(file_path string) {
@@ -174,7 +183,7 @@ func LoadParagraphsFromFile(file_path string) {
 }
 
 func LoadParagraphs() {
-	LoadParagraphsFromFile("./data/texts.json")
+	LoadParagraphsFromFile(GetDataDir() + "/texts.json")
 }
 
 func InitWithDefaults() {
