@@ -6,19 +6,19 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
-	"mock-ass/generator"
-	"mock-ass/random_data"
+	"github.com/wolfmetr/mock-ass/gen"
+	"github.com/wolfmetr/mock-ass/random_data"
 
 	"github.com/fatih/color"
-	"github.com/golang/glog"
 	"github.com/pmylund/go-cache"
 )
 
-type myHandler struct{}
+type handler struct{}
 
 var mux map[string]func(http.ResponseWriter, *http.Request) int
 
@@ -38,17 +38,17 @@ func init() {
 	LocalCache = cache.New(60*time.Minute, 30*time.Second)
 }
 
-func (*myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (*handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if hand, ok := mux[r.URL.Path]; ok {
 		status_code := hand(w, r)
 		if status_code >= 200 && status_code < 300 {
-			glog.Info(color.GreenString("[%s] %s — %d", r.Method, r.URL.String(), status_code))
+			log.Println(color.GreenString("[%s] %s — %d", r.Method, r.URL.String(), status_code))
 		} else {
-			glog.Info(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), status_code))
+			log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), status_code))
 		}
 		return
 	} else {
-		glog.Info(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), 404))
+		log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), 404))
 		io.WriteString(w, "404 not found mthrfckr!")
 	}
 
@@ -116,9 +116,9 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 
 		if user_tpl_c, found := LocalCache.Get(session_uuid); found {
 			user_tpl := user_tpl_c.(string)
-			out, err := generator.GenerateByTemplate(user_tpl, hash)
+			out, err := gen.GenerateByTemplate(user_tpl, hash)
 			if err != nil {
-				glog.Error(color.RedString(err.Error()))
+				log.Println(color.RedString(err.Error()))
 				w.WriteHeader(http.StatusInternalServerError)
 				return http.StatusInternalServerError
 			}
@@ -160,9 +160,9 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 			content_type = content_type_raw
 		}
 		hash := GetHash()
-		out, err := generator.GenerateByTemplate(user_tpl, hash)
+		out, err := gen.GenerateByTemplate(user_tpl, hash)
 		if err != nil {
-			glog.Error(color.RedString(err.Error()))
+			log.Println(color.RedString(err.Error()))
 			w.WriteHeader(http.StatusInternalServerError)
 			return http.StatusInternalServerError
 		}
@@ -198,7 +198,7 @@ func get_session(w http.ResponseWriter, r *http.Request) int {
 			var err error
 			ttl, err = strconv.ParseInt(ttl_raw, 10, 32)
 			if err != nil {
-				glog.Error(color.RedString(err.Error()))
+				log.Println(color.RedString(err.Error()))
 				w.WriteHeader(http.StatusInternalServerError)
 				return http.StatusInternalServerError
 			}
@@ -229,7 +229,6 @@ func get_session(w http.ResponseWriter, r *http.Request) int {
 func main() {
 	flagColor := flag.Bool("color", false, "enable color output")
 	port := flag.Int("port", 8000, "server start port")
-	flag.Lookup("logtostderr").Value.Set("true")
 	flag.Parse()
 	if *flagColor == false {
 		color.NoColor = true
@@ -240,9 +239,9 @@ func main() {
 	port_str := strconv.FormatInt(int64(*port), 10)
 	server := http.Server{
 		Addr:    ":" + port_str,
-		Handler: &myHandler{},
+		Handler: &handler{},
 	}
-	glog.Info(color.BlueString("Start server port %s", port_str))
+	log.Println(color.BlueString("Start server port %s", port_str))
 	mux = make(map[string]func(http.ResponseWriter, *http.Request) int)
 	mux["/session/"] = hello
 	mux["/init"] = get_session

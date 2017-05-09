@@ -3,10 +3,10 @@ package random_data
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/golang/glog"
 )
 
 type CountryType struct {
@@ -44,22 +44,19 @@ var Paragraphs []string
 func GetDataDir() string {
 	data_path := os.Getenv("MOCK_ASS_DATA_DIR")
 	if data_path == "" {
-		glog.Error(color.RedString("Environment variable MOCK ASS_DATA_DIR is empty"))
-		os.Exit(1)
+		log.Fatal(color.RedString("Environment variable MOCK ASS_DATA_DIR is empty"))
 	}
 	return data_path
 }
 
 func LoadCountriesFromFile(file_path string) {
-	glog.Info(color.BlueString("Load countries from file %s", file_path))
+	log.Println(color.BlueString("Load countries from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &Countries); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -68,15 +65,13 @@ func LoadCountries() {
 }
 
 func LoadLanguagesFromFile(file_path string) {
-	glog.Info(color.BlueString("Load languages from file %s", file_path))
+	log.Println(color.BlueString("Load languages from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &Languages); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -85,15 +80,13 @@ func LoadLanguages() {
 }
 
 func LoadStatesFromFile(file_path string) {
-	glog.Info(color.BlueString("Load states from file %s", file_path))
+	log.Println(color.BlueString("Load states from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &States); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -102,15 +95,13 @@ func LoadStates() {
 }
 
 func LoadFemaleNamesFromFile(file_path string) {
-	glog.Info(color.BlueString("Load female names from file %s", file_path))
+	log.Println(color.BlueString("Load female names from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &FemaleNames); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -119,15 +110,13 @@ func LoadFemaleNames() {
 }
 
 func LoadMaleNamesFromFile(file_path string) {
-	glog.Info(color.BlueString("Load male names from file %s", file_path))
+	log.Println(color.BlueString("Load male names from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &MaleNames); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -136,15 +125,13 @@ func LoadMaleNames() {
 }
 
 func LoadLastNamesFromFile(file_path string) {
-	glog.Info(color.BlueString("Load last names from file %s", file_path))
+	log.Println(color.BlueString("Load last names from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &LastNames); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -153,15 +140,13 @@ func LoadLastNames() {
 }
 
 func LoadEmailDomainsFromFile(file_path string) {
-	glog.Info(color.BlueString("Load email domains from file %s", file_path))
+	log.Println(color.BlueString("Load email domains from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &EmailDomains); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 
@@ -170,15 +155,13 @@ func LoadEmailDomains() {
 }
 
 func LoadParagraphsFromFile(file_path string) {
-	glog.Info(color.BlueString("Load paragraphs from file %s", file_path))
+	log.Println(color.BlueString("Load paragraphs from file %s", file_path))
 	file, err := ioutil.ReadFile(file_path)
 	if err != nil {
-		glog.Error(color.RedString("File error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("File error %v\n ", err))
 	}
 	if err := json.Unmarshal(file, &Paragraphs); err != nil {
-		glog.Error(color.RedString("Unmarshal error %v\n ", err))
-		os.Exit(1)
+		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
 	}
 }
 

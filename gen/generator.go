@@ -1,9 +1,11 @@
-package generator
+package gen
 
 import (
-	"gopkg.in/flosch/pongo2.v3"
-	"mock-ass/random_data"
 	"strings"
+
+	"github.com/wolfmetr/mock-ass/random_data"
+
+	"gopkg.in/flosch/pongo2.v3"
 )
 
 func Range(size int) []int {

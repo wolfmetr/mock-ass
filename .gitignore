@@ -6,6 +6,8 @@
 ehthumbs.db
 Thumbs.db
 
+.idea
+
 bin/
 pkg/
 env.sh
