@@ -1,4 +1,4 @@
-memo = "973d2cb1a3b38484776efb15c2afa922c5e240bdab0d0d525e37797cdad0f313"
+memo = "7e26e20280843bc1e911b2862f0ffbc50559ae3b683f4c8f4d42a91e4c267542"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -29,6 +29,12 @@ memo = "973d2cb1a3b38484776efb15c2afa922c5e240bdab0d0d525e37797cdad0f313"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "9ccfe848b9db8435a24c424abbc07a921adf1df5"
+
+[[projects]]
+  branch = "v1"
+  name = "gopkg.in/check.v1"
+  packages = ["."]
+  revision = "20d25e2804050c1cd24a7eea1e7a6447dd0e74ec"
 
 [[projects]]
   name = "gopkg.in/flosch/pongo2.v3"

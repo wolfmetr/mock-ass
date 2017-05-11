@@ -6,3 +6,9 @@ run:
 
 install:
 	go install ./cmd/mock-ass
+
+test:
+	go test $(shell go list ./...| grep -v vendor)
+
+test-vendor:
+	go test ./vendor/...

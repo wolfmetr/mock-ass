@@ -50,6 +50,7 @@
 # source = "https://github.com/myfork/package.git"
 
 
+required = ["gopkg.in/check.v1"]
 
 [[dependencies]]
   version = "v1.4.1"
