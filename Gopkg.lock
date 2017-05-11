@@ -1,0 +1,37 @@
+memo = "973d2cb1a3b38484776efb15c2afa922c5e240bdab0d0d525e37797cdad0f313"
+
+[[projects]]
+  name = "github.com/fatih/color"
+  packages = ["."]
+  revision = "9131ab34cf20d2f6d83fdc67168a5430d1c7dc23"
+  version = "v1.4.1"
+
+[[projects]]
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  revision = "d228849504861217f796da67fae4f6e347643f15"
+  version = "v0.0.7"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
+  version = "v0.0.2"
+
+[[projects]]
+  name = "github.com/pmylund/go-cache"
+  packages = ["."]
+  revision = "1881a9bccb818787f68c52bfba648c6cf34c34fa"
+  version = "v2.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  revision = "9ccfe848b9db8435a24c424abbc07a921adf1df5"
+
+[[projects]]
+  name = "gopkg.in/flosch/pongo2.v3"
+  packages = ["."]
+  revision = "5e81b817a0c48c1c57cdf1a9056cf76bdee02ca9"
+  version = "v3.0"
