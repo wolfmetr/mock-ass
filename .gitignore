@@ -10,4 +10,5 @@ Thumbs.db
 
 bin/
 pkg/
+vendor/
 env.sh
