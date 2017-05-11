@@ -16,12 +16,12 @@ func Range(size int) []int {
 	return sl
 }
 
-func GenerateByTemplate(template string, hash string) (out string, err error) {
+func GenerateByTemplate(template string, hash string, collection *random_data.RandomDataCollection) (out string, err error) {
 	tpl, err := pongo2.FromString(template)
 	if err != nil {
 		return "", err
 	}
-	rd := random_data.NewRandomData(hash)
+	rd := random_data.NewRandomData(hash,collection)
 	out, err = tpl.Execute(pongo2.Context{
 		"FirstName":               rd.FirstName,
 		"FirstNameChain":          rd.FirstNameChain,

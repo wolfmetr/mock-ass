@@ -13,6 +13,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/pmylund/go-cache"
+	"github.com/wolfmetr/mock-ass/random_data"
 )
 
 const SESSION_URL string = "/session/?s=%s"
@@ -48,7 +49,7 @@ func getHash() string {
 	return hash
 }
 
-func hello(w http.ResponseWriter, r *http.Request) int {
+func hello(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
 	r.ParseForm()
 	if r.Method == "GET" {
 		need_redirect := false
@@ -82,7 +83,7 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 
 		if user_tpl_c, found := LocalCache.Get(session_uuid); found {
 			user_tpl := user_tpl_c.(string)
-			out, err := gen.GenerateByTemplate(user_tpl, hash)
+			out, err := gen.GenerateByTemplate(user_tpl, hash, collection)
 			if err != nil {
 				log.Println(color.RedString(err.Error()))
 				w.WriteHeader(http.StatusInternalServerError)
@@ -126,7 +127,7 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 			content_type = content_type_raw
 		}
 		hash := getHash()
-		out, err := gen.GenerateByTemplate(user_tpl, hash)
+		out, err := gen.GenerateByTemplate(user_tpl, hash, collection)
 		if err != nil {
 			log.Println(color.RedString(err.Error()))
 			w.WriteHeader(http.StatusInternalServerError)
@@ -149,7 +150,7 @@ func hello(w http.ResponseWriter, r *http.Request) int {
 	return http.StatusMethodNotAllowed
 }
 
-func get_session(w http.ResponseWriter, r *http.Request) int {
+func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
 	if r.Method == "POST" {
 		r.ParseForm()
 		user_tpl := r.FormValue(FORM_KEY_TEMPLATE)

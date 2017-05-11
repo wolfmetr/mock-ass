@@ -35,34 +35,39 @@ func stringToInt64(str string) int64 {
 }
 
 type RandomData struct {
-	hash      string
-	hashInt64 int64
+	hash       string
+	hashInt64  int64
+	collection *RandomDataCollection
 }
 
-func NewRandomData(hash string) *RandomData {
+func NewRandomData(hash string, collection *RandomDataCollection) *RandomData {
 	hashInt64 := stringToInt64(hash)
-	return &RandomData{hash: hash, hashInt64: hashInt64}
+	return &RandomData{
+		hash:       hash,
+		hashInt64:  hashInt64,
+		collection: collection,
+	}
 }
 
 func (rd *RandomData) getFirstName(gender int, src int64) string {
 	r := rand.New(rand.NewSource(src))
 	switch gender {
 	case Male:
-		return MaleNames[r.Intn(len(MaleNames))]
+		return rd.collection.MaleNames[r.Intn(len(rd.collection.MaleNames))]
 	case Female:
-		return FemaleNames[r.Intn(len(FemaleNames))]
+		return rd.collection.FemaleNames[r.Intn(len(rd.collection.FemaleNames))]
 	default:
 		if rd.getBoolean(src) {
-			return MaleNames[r.Intn(len(MaleNames))]
+			return rd.collection.MaleNames[r.Intn(len(rd.collection.MaleNames))]
 		} else {
-			return FemaleNames[r.Intn(len(FemaleNames))]
+			return rd.collection.FemaleNames[r.Intn(len(rd.collection.FemaleNames))]
 		}
 	}
 }
 
 func (rd *RandomData) getLastName(src int64) string {
 	r := rand.New(rand.NewSource(src))
-	return LastNames[r.Intn(len(LastNames))]
+	return rd.collection.LastNames[r.Intn(len(rd.collection.LastNames))]
 }
 
 func (rd *RandomData) getEmail(src int64) string {
@@ -70,36 +75,36 @@ func (rd *RandomData) getEmail(src int64) string {
 	return fmt.Sprintf("%s.%s.example@%s",
 		strings.ToLower(rd.FirstName()),
 		strings.ToLower(rd.LastName()),
-		EmailDomains[r.Intn(len(EmailDomains))])
+		rd.collection.EmailDomains[r.Intn(len(rd.collection.EmailDomains))])
 }
 
 func (rd *RandomData) getCity(src int64) string {
 	r := rand.New(rand.NewSource(src))
-	return Countries[r.Intn(len(Countries))].Capital
+	return rd.collection.Countries[r.Intn(len(rd.collection.Countries))].Capital
 }
 
 func (rd *RandomData) getCountry(formatCountry int, src int64) string {
 	r := rand.New(rand.NewSource(src))
 	switch formatCountry {
 	case CountryNameFormat:
-		return Countries[r.Intn(len(Countries))].Name.Official
+		return rd.collection.Countries[r.Intn(len(rd.collection.Countries))].Name.Official
 	case CountryCode2Format:
-		return Countries[r.Intn(len(Countries))].CountryCode2
+		return rd.collection.Countries[r.Intn(len(rd.collection.Countries))].CountryCode2
 	case CountryCode3Format:
-		return Countries[r.Intn(len(Countries))].CountryCode3
+		return rd.collection.Countries[r.Intn(len(rd.collection.Countries))].CountryCode3
 	}
-	return Countries[r.Intn(len(Countries))].Name.Official
+	return rd.collection.Countries[r.Intn(len(rd.collection.Countries))].Name.Official
 }
 
 func (rd *RandomData) getStateUsa(stateFormat int, src int64) string {
 	r := rand.New(rand.NewSource(src))
 	switch stateFormat {
 	case StateUsaCodeFormat:
-		return States[r.Intn(len(States))].Code
+		return rd.collection.States[r.Intn(len(rd.collection.States))].Code
 	case StateUsaNameFormat:
-		return States[r.Intn(len(States))].State
+		return rd.collection.States[r.Intn(len(rd.collection.States))].State
 	}
-	return States[r.Intn(len(States))].State
+	return rd.collection.States[r.Intn(len(rd.collection.States))].State
 }
 
 func (rd *RandomData) getBoolean(src int64) bool {
@@ -142,7 +147,7 @@ func (rd *RandomData) getIPv4(src int64) string {
 
 func (rd *RandomData) getParagraph(src int64) string {
 	r := rand.New(rand.NewSource(src))
-	return Paragraphs[r.Intn(len(Paragraphs))]
+	return rd.collection.Paragraphs[r.Intn(len(rd.collection.Paragraphs))]
 }
 
 func (rd *RandomData) FirstName() string {

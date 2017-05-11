@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/wolfmetr/mock-ass/random_data"
 
@@ -24,10 +23,15 @@ func main() {
 	}
 	port := *flagPort
 
-	random_data.InitWithDefaults()
+	collection, err := random_data.InitCollection()
+	if err != nil {
+		log.Fatalf(color.RedString("InitCollection error: %v", err))
+	}
+	log.Println(color.BlueString("Data collection successfully loaded"))
 	server := http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: newAppHandler(
+			collection,
 			Route{
 				path: "/session/",
 				hand: hello,
@@ -41,7 +45,6 @@ func main() {
 
 	log.Println(color.BlueString("Start server port %d", port))
 	if err := server.ListenAndServe(); err != nil {
-		log.Println(color.RedString("serve error: %v", err))
-		os.Exit(1)
+		log.Fatalf(color.RedString("serve error: %v", err))
 	}
 }

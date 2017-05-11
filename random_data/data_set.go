@@ -31,16 +31,6 @@ type StateType struct {
 	Code  string `json:"code"`
 }
 
-// http://siteresources.worldbank.org/DATASTATISTICS/Resources/CLASS.XLS
-var Countries []CountryType
-var Languages []LanguageType
-var States []StateType
-var FemaleNames []string
-var MaleNames []string
-var LastNames []string
-var EmailDomains []string
-var Paragraphs []string
-
 func GetDataDir() string {
 	data_path := os.Getenv("MOCK_ASS_DATA_DIR")
 	if data_path == "" {
@@ -49,133 +39,155 @@ func GetDataDir() string {
 	return data_path
 }
 
-func LoadCountriesFromFile(file_path string) {
-	log.Println(color.BlueString("Load countries from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadCountriesFromFile(file_path string) (countries []CountryType, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &Countries); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err = json.Unmarshal(file, &countries); err != nil {
+		return nil, err
 	}
+	return countries, nil
 }
 
-func LoadCountries() {
-	LoadCountriesFromFile(GetDataDir() + "/countries.json")
-}
-
-func LoadLanguagesFromFile(file_path string) {
-	log.Println(color.BlueString("Load languages from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadLanguagesFromFile(file_path string) (languages []LanguageType, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &Languages); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &languages); err != nil {
+		return nil, err
 	}
+	return languages, nil
 }
 
-func LoadLanguages() {
-	LoadLanguagesFromFile(GetDataDir() + "/languages.json")
-}
-
-func LoadStatesFromFile(file_path string) {
-	log.Println(color.BlueString("Load states from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadStatesFromFile(file_path string) (states []StateType, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &States); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &states); err != nil {
+		return nil, err
 	}
+	return states, nil
 }
 
-func LoadStates() {
-	LoadStatesFromFile(GetDataDir() + "/usa_states.json")
-}
-
-func LoadFemaleNamesFromFile(file_path string) {
-	log.Println(color.BlueString("Load female names from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadFemaleNamesFromFile(file_path string) (femaleNames []string, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &FemaleNames); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &femaleNames); err != nil {
+		return nil, err
 	}
+	return femaleNames, nil
 }
 
-func LoadFemaleNames() {
-	LoadFemaleNamesFromFile(GetDataDir() + "/female_names.json")
-}
-
-func LoadMaleNamesFromFile(file_path string) {
-	log.Println(color.BlueString("Load male names from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadMaleNamesFromFile(file_path string) (maleNames []string, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &MaleNames); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &maleNames); err != nil {
+		return nil, err
 	}
+	return maleNames, nil
 }
 
-func LoadMaleNames() {
-	LoadMaleNamesFromFile(GetDataDir() + "/male_names.json")
-}
-
-func LoadLastNamesFromFile(file_path string) {
-	log.Println(color.BlueString("Load last names from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadLastNamesFromFile(file_path string) (lastNames []string, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &LastNames); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &lastNames); err != nil {
+		return nil, err
 	}
+	return lastNames, nil
 }
 
-func LoadLastNames() {
-	LoadLastNamesFromFile(GetDataDir() + "/last_names.json")
-}
-
-func LoadEmailDomainsFromFile(file_path string) {
-	log.Println(color.BlueString("Load email domains from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadEmailDomainsFromFile(file_path string) (emailDomains []string, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &EmailDomains); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &emailDomains); err != nil {
+		return nil, err
 	}
+	return emailDomains, nil
 }
 
-func LoadEmailDomains() {
-	LoadEmailDomainsFromFile(GetDataDir() + "/email_domains.json")
-}
-
-func LoadParagraphsFromFile(file_path string) {
-	log.Println(color.BlueString("Load paragraphs from file %s", file_path))
-	file, err := ioutil.ReadFile(file_path)
+func LoadParagraphsFromFile(file_path string) (paragraphs []string, err error) {
+	var file []byte
+	file, err = ioutil.ReadFile(file_path)
 	if err != nil {
-		log.Fatal(color.RedString("File error %v\n ", err))
+		return nil, err
 	}
-	if err := json.Unmarshal(file, &Paragraphs); err != nil {
-		log.Fatal(color.RedString("Unmarshal error %v\n ", err))
+	if err := json.Unmarshal(file, &paragraphs); err != nil {
+		return nil, err
 	}
+	return paragraphs, nil
 }
 
-func LoadParagraphs() {
-	LoadParagraphsFromFile(GetDataDir() + "/texts.json")
+// http://siteresources.worldbank.org/DATASTATISTICS/Resources/CLASS.XLS
+type RandomDataCollection struct {
+	Countries    []CountryType
+	Languages    []LanguageType
+	States       []StateType
+	FemaleNames  []string
+	MaleNames    []string
+	LastNames    []string
+	EmailDomains []string
+	Paragraphs   []string
 }
 
-func InitWithDefaults() {
-	LoadCountries()
-	LoadStates()
-	LoadLanguages()
-	LoadLastNames()
-	LoadFemaleNames()
-	LoadMaleNames()
-	LoadEmailDomains()
-	LoadParagraphs()
+func InitCollection() (*RandomDataCollection, error) {
+	countries, err := LoadCountriesFromFile(GetDataDir() + "/countries.json")
+	if err != nil {
+		return nil, err
+	}
+	languages, err := LoadLanguagesFromFile(GetDataDir() + "/languages.json")
+	if err != nil {
+		return nil, err
+	}
+	states, err := LoadStatesFromFile(GetDataDir() + "/usa_states.json")
+	if err != nil {
+		return nil, err
+	}
+	femaleNames, err := LoadFemaleNamesFromFile(GetDataDir() + "/female_names.json")
+	if err != nil {
+		return nil, err
+	}
+	maleNames, err := LoadMaleNamesFromFile(GetDataDir() + "/male_names.json")
+	if err != nil {
+		return nil, err
+	}
+	lastNames, err := LoadLastNamesFromFile(GetDataDir() + "/last_names.json")
+	if err != nil {
+		return nil, err
+	}
+	emailDomains, err := LoadEmailDomainsFromFile(GetDataDir() + "/email_domains.json")
+	if err != nil {
+		return nil, err
+	}
+	paragraphs, err := LoadParagraphsFromFile(GetDataDir() + "/texts.json")
+	if err != nil {
+		return nil, err
+	}
+	return &RandomDataCollection{
+		Countries:    countries,
+		Languages:    languages,
+		States:       states,
+		FemaleNames:  femaleNames,
+		MaleNames:    maleNames,
+		LastNames:    lastNames,
+		EmailDomains: emailDomains,
+		Paragraphs:   paragraphs,
+	}, nil
 }
