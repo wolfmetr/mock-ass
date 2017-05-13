@@ -3,10 +3,7 @@ package random_data
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
-	"os"
-
-	"github.com/fatih/color"
+	"path/filepath"
 )
 
 type CountryType struct {
@@ -31,17 +28,9 @@ type StateType struct {
 	Code  string `json:"code"`
 }
 
-func GetDataDir() string {
-	data_path := os.Getenv("MOCK_ASS_DATA_DIR")
-	if data_path == "" {
-		log.Fatal(color.RedString("Environment variable MOCK ASS_DATA_DIR is empty"))
-	}
-	return data_path
-}
-
-func LoadCountriesFromFile(file_path string) (countries []CountryType, err error) {
+func LoadCountriesFromFile(filePath string) (countries []CountryType, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -51,9 +40,9 @@ func LoadCountriesFromFile(file_path string) (countries []CountryType, err error
 	return countries, nil
 }
 
-func LoadLanguagesFromFile(file_path string) (languages []LanguageType, err error) {
+func LoadLanguagesFromFile(filePath string) (languages []LanguageType, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -63,9 +52,9 @@ func LoadLanguagesFromFile(file_path string) (languages []LanguageType, err erro
 	return languages, nil
 }
 
-func LoadStatesFromFile(file_path string) (states []StateType, err error) {
+func LoadStatesFromFile(filePath string) (states []StateType, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +64,9 @@ func LoadStatesFromFile(file_path string) (states []StateType, err error) {
 	return states, nil
 }
 
-func LoadFemaleNamesFromFile(file_path string) (femaleNames []string, err error) {
+func LoadFemaleNamesFromFile(filePath string) (femaleNames []string, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +76,9 @@ func LoadFemaleNamesFromFile(file_path string) (femaleNames []string, err error)
 	return femaleNames, nil
 }
 
-func LoadMaleNamesFromFile(file_path string) (maleNames []string, err error) {
+func LoadMaleNamesFromFile(filePath string) (maleNames []string, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +88,9 @@ func LoadMaleNamesFromFile(file_path string) (maleNames []string, err error) {
 	return maleNames, nil
 }
 
-func LoadLastNamesFromFile(file_path string) (lastNames []string, err error) {
+func LoadLastNamesFromFile(filePath string) (lastNames []string, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -111,9 +100,9 @@ func LoadLastNamesFromFile(file_path string) (lastNames []string, err error) {
 	return lastNames, nil
 }
 
-func LoadEmailDomainsFromFile(file_path string) (emailDomains []string, err error) {
+func LoadEmailDomainsFromFile(filePath string) (emailDomains []string, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +112,9 @@ func LoadEmailDomainsFromFile(file_path string) (emailDomains []string, err erro
 	return emailDomains, nil
 }
 
-func LoadParagraphsFromFile(file_path string) (paragraphs []string, err error) {
+func LoadParagraphsFromFile(filePath string) (paragraphs []string, err error) {
 	var file []byte
-	file, err = ioutil.ReadFile(file_path)
+	file, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -147,36 +136,48 @@ type RandomDataCollection struct {
 	Paragraphs   []string
 }
 
-func InitCollection() (*RandomDataCollection, error) {
-	countries, err := LoadCountriesFromFile(GetDataDir() + "/countries.json")
+// Default file names; reset if you need.
+var (
+	CountriesFile    string = "countries.json"
+	LanguagesFile    string = "languages.json"
+	StatesFile       string = "usa_states.json"
+	FemaleNamesFile  string = "female_names.json"
+	MaleNamesFile    string = "male_names.json"
+	LastNamesFile    string = "last_names.json"
+	EmailDomainsFile string = "email_domains.json"
+	TextsFile        string = "texts.json"
+)
+
+func InitCollection(dataPath string) (*RandomDataCollection, error) {
+	countries, err := LoadCountriesFromFile(filepath.Join(dataPath, CountriesFile))
 	if err != nil {
 		return nil, err
 	}
-	languages, err := LoadLanguagesFromFile(GetDataDir() + "/languages.json")
+	languages, err := LoadLanguagesFromFile(filepath.Join(dataPath, LanguagesFile))
 	if err != nil {
 		return nil, err
 	}
-	states, err := LoadStatesFromFile(GetDataDir() + "/usa_states.json")
+	states, err := LoadStatesFromFile(filepath.Join(dataPath, StatesFile))
 	if err != nil {
 		return nil, err
 	}
-	femaleNames, err := LoadFemaleNamesFromFile(GetDataDir() + "/female_names.json")
+	femaleNames, err := LoadFemaleNamesFromFile(filepath.Join(dataPath, FemaleNamesFile))
 	if err != nil {
 		return nil, err
 	}
-	maleNames, err := LoadMaleNamesFromFile(GetDataDir() + "/male_names.json")
+	maleNames, err := LoadMaleNamesFromFile(filepath.Join(dataPath, MaleNamesFile))
 	if err != nil {
 		return nil, err
 	}
-	lastNames, err := LoadLastNamesFromFile(GetDataDir() + "/last_names.json")
+	lastNames, err := LoadLastNamesFromFile(filepath.Join(dataPath, LastNamesFile))
 	if err != nil {
 		return nil, err
 	}
-	emailDomains, err := LoadEmailDomainsFromFile(GetDataDir() + "/email_domains.json")
+	emailDomains, err := LoadEmailDomainsFromFile(filepath.Join(dataPath, EmailDomainsFile))
 	if err != nil {
 		return nil, err
 	}
-	paragraphs, err := LoadParagraphsFromFile(GetDataDir() + "/texts.json")
+	paragraphs, err := LoadParagraphsFromFile(filepath.Join(dataPath, TextsFile))
 	if err != nil {
 		return nil, err
 	}

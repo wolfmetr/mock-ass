@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/wolfmetr/mock-ass/random_data"
 
@@ -16,6 +17,12 @@ var (
 	flagPort  = flag.Uint("port", 8000, "server start port")
 )
 
+var dataPath string
+
+func init() {
+	dataPath = os.Getenv("MOCK_ASS_DATA_DIR")
+}
+
 func main() {
 	flag.Parse()
 	if *flagColor == false {
@@ -23,7 +30,7 @@ func main() {
 	}
 	port := *flagPort
 
-	collection, err := random_data.InitCollection()
+	collection, err := random_data.InitCollection(dataPath)
 	if err != nil {
 		log.Fatalf(color.RedString("InitCollection error: %v", err))
 	}
