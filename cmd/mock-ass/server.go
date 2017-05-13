@@ -33,11 +33,11 @@ func newAppHandler(collection *random_data.RandomDataCollection, routes ...Route
 
 func (h *AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if route, ok := h.routes[r.URL.Path]; ok {
-		status_code := route.hand(w, r, h.collection)
-		if status_code >= 200 && status_code < 300 {
-			log.Println(color.GreenString("[%s] %s — %d", r.Method, r.URL.String(), status_code))
+		statusCode := route.hand(w, r, h.collection)
+		if statusCode >= http.StatusOK && statusCode < http.StatusMultipleChoices {
+			log.Println(color.GreenString("[%s] %s — %d", r.Method, r.URL.String(), statusCode))
 		} else {
-			log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), status_code))
+			log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), statusCode))
 		}
 		return
 	} else {
