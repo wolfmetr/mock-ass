@@ -28,7 +28,6 @@ func main() {
 	if *flagColor == false {
 		color.NoColor = true
 	}
-	port := *flagPort
 
 	collection, err := random_data.InitCollection(dataPath)
 	if err != nil {
@@ -36,12 +35,12 @@ func main() {
 	}
 	log.Println(color.BlueString("Data collection successfully loaded"))
 	server := http.Server{
-		Addr: fmt.Sprintf(":%d", port),
+		Addr: fmt.Sprintf(":%d", *flagPort),
 		Handler: newAppHandler(
 			collection,
 			Route{
 				path: "/session/",
-				hand: hello,
+				hand: generateResp,
 			},
 			Route{
 				path: "/init",
@@ -50,7 +49,7 @@ func main() {
 		),
 	}
 
-	log.Println(color.BlueString("Start server port %d", port))
+	log.Println(color.BlueString("Start server port %d", *flagPort))
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf(color.RedString("serve error: %v", err))
 	}

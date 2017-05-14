@@ -16,17 +16,17 @@ import (
 	"github.com/pmylund/go-cache"
 )
 
-const SESSION_URL string = "/session/?s=%s"
-const DEFAULT_CONTENT_TYPE string = "application/json"
+const sessionUrl string = "/session/?s=%s"
+const defaultContentType string = "application/json"
 
 const (
-	DEFAULT_SESSION_TTL_MINUTES int64 = 60
-	DEFAULT_DATA_TTL_MINUTES    int64 = 15
+	defaultSessionTtlMinutes time.Duration = 60 * time.Minute
+	defaultDataTtlMinutes    time.Duration = 15 * time.Minute
 )
 const (
-	FORM_KEY_TEMPLATE        = "template"
-	FORM_KEY_CONTENT_TYPE    = "content_type"
-	FORM_KEY_SESSION_TTL_MIN = "session_ttl_min"
+	formKeyTemplate      = "template"
+	formKeyContentType   = "content_type"
+	formKeySessionTtlMin = "session_ttl_min"
 )
 
 type SessionResponse struct {
@@ -59,31 +59,29 @@ func getCacheCtKey(sessionUuid string) string {
 	return fmt.Sprintf("ct_%s", sessionUuid)
 }
 
-func hello(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+func generateResp(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
 	r.ParseForm()
 	if r.Method == http.MethodGet {
-		need_redirect := false
+		needRedirect := false
 		hash := r.FormValue("h")
-		session_uuid := r.FormValue("s")
-		if session_uuid == "" {
+		sessionUuid := r.FormValue("s")
+		if sessionUuid == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			return http.StatusBadRequest
 		}
-		data_ttl_min := DEFAULT_DATA_TTL_MINUTES
-		cache_data_ttl_td := time.Duration(data_ttl_min * int64(time.Minute))
+
 		if hash == "" {
 			hash = getHash()
-			need_redirect = true
+			needRedirect = true
 		} else {
 			if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
-				LocalCache.Set(getCacheHashKey(hash), result, cache_data_ttl_td)
-				content_type := DEFAULT_CONTENT_TYPE
-				content_type_raw, found := LocalCache.Get(getCacheCtKey(session_uuid))
-				if found {
-					content_type = content_type_raw.(string)
+				LocalCache.Set(getCacheHashKey(hash), result, defaultDataTtlMinutes)
+				contentType := defaultContentType
+				if contentTypeRaw, found := LocalCache.Get(getCacheCtKey(sessionUuid)); found {
+					contentType = contentTypeRaw.(string)
 				}
-				LocalCache.Set(getCacheCtKey(session_uuid), content_type, cache_data_ttl_td)
-				w.Header().Set("Content-Type", content_type)
+				LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
+				w.Header().Set("Content-Type", contentType)
 				w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 				w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -92,35 +90,35 @@ func hello(w http.ResponseWriter, r *http.Request, collection *random_data.Rando
 			}
 		}
 
-		if user_tpl_c, found := LocalCache.Get(session_uuid); found {
-			user_tpl := user_tpl_c.(string)
-			out, err := gen.GenerateByTemplate(user_tpl, hash, collection)
+		if userTplC, found := LocalCache.Get(sessionUuid); found {
+			userTpl := userTplC.(string)
+			out, err := gen.GenerateByTemplate(userTpl, hash, collection)
 			if err != nil {
 				log.Println(color.RedString(err.Error()))
 				w.WriteHeader(http.StatusInternalServerError)
 				return http.StatusInternalServerError
 			}
-			LocalCache.Set(getCacheHashKey(hash), out, cache_data_ttl_td)
+			LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
 
-			if need_redirect {
-				url_redirect := r.URL
-				q := url_redirect.Query()
-				q.Set("s", session_uuid)
+			if needRedirect {
+				urlRedirect := r.URL
+				q := urlRedirect.Query()
+				q.Set("s", sessionUuid)
 				q.Set("h", hash)
-				url_redirect.RawQuery = q.Encode()
-				w.Header().Set("Location", url_redirect.String())
+				urlRedirect.RawQuery = q.Encode()
+				w.Header().Set("Location", urlRedirect.String())
 				w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 				w.Header().Set("Access-Control-Allow-Origin", "*")
 				w.WriteHeader(http.StatusTemporaryRedirect)
 				return http.StatusTemporaryRedirect
 			}
-			content_type, found := LocalCache.Get(getCacheCtKey(session_uuid))
+			contentType, found := LocalCache.Get(getCacheCtKey(sessionUuid))
 			if !found {
-				content_type = DEFAULT_CONTENT_TYPE
+				contentType = defaultContentType
 			}
-			LocalCache.Set(getCacheCtKey(session_uuid), content_type, cache_data_ttl_td)
-			w.Header().Set("Content-Type", content_type.(string))
+			LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
+			w.Header().Set("Content-Type", contentType.(string))
 			w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -131,20 +129,20 @@ func hello(w http.ResponseWriter, r *http.Request, collection *random_data.Rando
 			return http.StatusUnauthorized
 		}
 	} else if r.Method == http.MethodPost {
-		user_tpl := r.FormValue(FORM_KEY_TEMPLATE)
+		userTpl := r.FormValue(formKeyTemplate)
 
-		content_type := DEFAULT_CONTENT_TYPE
-		if content_type_raw := r.FormValue(FORM_KEY_CONTENT_TYPE); content_type_raw != "" {
-			content_type = content_type_raw
+		contentType := defaultContentType
+		if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
+			contentType = contentTypeRaw
 		}
 		hash := getHash()
-		out, err := gen.GenerateByTemplate(user_tpl, hash, collection)
+		out, err := gen.GenerateByTemplate(userTpl, hash, collection)
 		if err != nil {
 			log.Println(color.RedString(err.Error()))
 			w.WriteHeader(http.StatusInternalServerError)
 			return http.StatusInternalServerError
 		}
-		w.Header().Set("Content-Type", content_type)
+		w.Header().Set("Content-Type", contentType)
 		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -164,45 +162,43 @@ func hello(w http.ResponseWriter, r *http.Request, collection *random_data.Rando
 func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
 	if r.Method == http.MethodPost {
 		r.ParseForm()
-		user_tpl := r.FormValue(FORM_KEY_TEMPLATE)
+		userTpl := r.FormValue(formKeyTemplate)
 
-		content_type := DEFAULT_CONTENT_TYPE
-		if content_type_raw := r.FormValue(FORM_KEY_CONTENT_TYPE); content_type_raw != "" {
-			content_type = content_type_raw
+		contentType := defaultContentType
+		if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
+			contentType = contentTypeRaw
 		}
 
-		ttl := DEFAULT_SESSION_TTL_MINUTES
-		if ttl_raw := r.FormValue(FORM_KEY_SESSION_TTL_MIN); ttl_raw != "" {
+		ttl := defaultSessionTtlMinutes
+		if ttlRaw := r.FormValue(formKeySessionTtlMin); ttlRaw != "" {
 			var err error
-			ttl, err = strconv.ParseInt(ttl_raw, 10, 32)
+			var ttlParsedInt int64
+			ttlParsedInt, err = strconv.ParseInt(ttlRaw, 10, 32)
 			if err != nil {
 				log.Println(color.RedString(err.Error()))
 				w.WriteHeader(http.StatusInternalServerError)
 				return http.StatusInternalServerError
 			}
+			ttl = time.Duration(ttlParsedInt) * time.Minute
 		}
 
-		session_uuid, err := newUUID()
-		for err != nil {
-			session_uuid, err = newUUID()
+		sessionUuid := getHash()
+		cacheDataTtlTd := time.Minute * time.Duration(ttl)
+		LocalCache.Set(sessionUuid, userTpl, cacheDataTtlTd)
+		LocalCache.Set(getCacheCtKey(sessionUuid), contentType, cacheDataTtlTd)
+
+		sessionResp := &SessionResponse{
+			Session: sessionUuid,
+			Url:     fmt.Sprintf(sessionUrl, sessionUuid),
 		}
 
-		cache_data_ttl_td := time.Minute * time.Duration(ttl)
-		LocalCache.Set(session_uuid, user_tpl, cache_data_ttl_td)
-		LocalCache.Set(getCacheCtKey(session_uuid), content_type, cache_data_ttl_td)
-
-		session_resp := &SessionResponse{
-			Session: session_uuid,
-			Url:     fmt.Sprintf(SESSION_URL, session_uuid),
-		}
-
-		session_resp_json, err := json.Marshal(session_resp)
+		sessionRespJson, err := json.Marshal(sessionResp)
 		if err != nil {
 			log.Println(color.RedString(err.Error()))
 			return http.StatusInternalServerError
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(session_resp_json)
+		w.Write(sessionRespJson)
 		return http.StatusOK
 	}
 
