@@ -1,8 +1,6 @@
 package gen
 
 import (
-	"strings"
-
 	"github.com/wolfmetr/mock-ass/random_data"
 
 	"gopkg.in/flosch/pongo2.v3"
@@ -21,7 +19,7 @@ func GenerateByTemplate(template string, hash string, collection *random_data.Ra
 	if err != nil {
 		return "", err
 	}
-	rd := random_data.NewRandomData(hash,collection)
+	rd := random_data.NewRandomData(hash, collection)
 	out, err = tpl.Execute(pongo2.Context{
 		"FirstName":               rd.FirstName,
 		"FirstNameChain":          rd.FirstNameChain,
@@ -73,6 +71,6 @@ func GenerateByTemplate(template string, hash string, collection *random_data.Ra
 	if err != nil {
 		return "", err
 	}
-	out = strings.Replace(out, "\n", "\\n", -1)
+	//out = strings.Replace(out, "\n", "\\n", -1)
 	return out, nil
 }

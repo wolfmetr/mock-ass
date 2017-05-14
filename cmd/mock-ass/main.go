@@ -39,7 +39,7 @@ func main() {
 		Handler: newAppHandler(
 			collection,
 			Route{
-				path: "/session/",
+				path: "/session",
 				hand: generateResp,
 			},
 			Route{

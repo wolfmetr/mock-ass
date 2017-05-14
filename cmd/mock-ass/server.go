@@ -1,9 +1,9 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/wolfmetr/mock-ass/random_data"
@@ -27,8 +27,15 @@ func newAppHandler(collection *random_data.RandomDataCollection, routes ...Route
 	h.collection = collection
 	for _, route := range routes {
 		h.routes[route.path] = route
+		lp := len(route.path)
+		if strings.HasSuffix(route.path, "/") {
+			h.routes[route.path[:lp-1]] = route
+		} else {
+			h.routes[route.path+"/"] = route
+		}
 	}
-	return nil
+
+	return h
 }
 
 func (h *AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +49,6 @@ func (h *AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), 404))
-		io.WriteString(w, "404 not found mthrfckr!")
+		http.NotFound(w, r)
 	}
 }
