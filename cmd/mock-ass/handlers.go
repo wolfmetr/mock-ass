@@ -59,104 +59,116 @@ func getCacheCtKey(sessionUuid string) string {
 	return fmt.Sprintf("ct_%s", sessionUuid)
 }
 
-func generateResp(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
-	r.ParseForm()
-	if r.Method == http.MethodGet {
-		needRedirect := false
-		hash := r.FormValue("h")
-		sessionUuid := r.FormValue("s")
-		if sessionUuid == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return http.StatusBadRequest
-		}
+func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+	needRedirect := false
+	hash := r.FormValue("h")
+	sessionUuid := r.FormValue("s")
+	if sessionUuid == "" {
+		log.Println(color.RedString("session argument empty or not found"))
+		w.WriteHeader(http.StatusBadRequest)
+		return http.StatusBadRequest
+	}
 
-		if hash == "" {
-			hash = getHash()
-			needRedirect = true
-		} else {
-			if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
-				LocalCache.Set(getCacheHashKey(hash), result, defaultDataTtlMinutes)
-				contentType := defaultContentType
-				if contentTypeRaw, found := LocalCache.Get(getCacheCtKey(sessionUuid)); found {
-					contentType = contentTypeRaw.(string)
-				}
-				LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
-				w.Header().Set("Content-Type", contentType)
-				w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-				w.Header().Set("Access-Control-Allow-Origin", "*")
-				io.WriteString(w, result.(string))
-				return http.StatusOK
-			}
-		}
-
-		if userTplC, found := LocalCache.Get(sessionUuid); found {
-			userTpl := userTplC.(string)
-			out, err := gen.GenerateByTemplate(userTpl, hash, collection)
-			if err != nil {
-				log.Println(color.RedString(err.Error()))
-				w.WriteHeader(http.StatusInternalServerError)
-				return http.StatusInternalServerError
-			}
-			LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
-
-			if needRedirect {
-				urlRedirect := r.URL
-				q := urlRedirect.Query()
-				q.Set("s", sessionUuid)
-				q.Set("h", hash)
-				urlRedirect.RawQuery = q.Encode()
-				w.Header().Set("Location", urlRedirect.String())
-				w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-				w.Header().Set("Access-Control-Allow-Origin", "*")
-				w.WriteHeader(http.StatusTemporaryRedirect)
-				return http.StatusTemporaryRedirect
-			}
-			contentType, found := LocalCache.Get(getCacheCtKey(sessionUuid))
-			if !found {
-				contentType = defaultContentType
+	if hash == "" {
+		hash = getHash()
+		needRedirect = true
+	} else {
+		if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
+			LocalCache.Set(getCacheHashKey(hash), result, defaultDataTtlMinutes)
+			contentType := defaultContentType
+			if contentTypeRaw, found := LocalCache.Get(getCacheCtKey(sessionUuid)); found {
+				contentType = contentTypeRaw.(string)
 			}
 			LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
-			w.Header().Set("Content-Type", contentType.(string))
+			w.Header().Set("Content-Type", contentType)
 			w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
-			io.WriteString(w, out)
+			io.WriteString(w, result.(string))
 			return http.StatusOK
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-			return http.StatusUnauthorized
 		}
-	} else if r.Method == http.MethodPost {
-		userTpl := r.FormValue(formKeyTemplate)
+	}
 
-		contentType := defaultContentType
-		if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
-			contentType = contentTypeRaw
-		}
-		hash := getHash()
+	if userTplC, found := LocalCache.Get(sessionUuid); found {
+		userTpl := userTplC.(string)
 		out, err := gen.GenerateByTemplate(userTpl, hash, collection)
 		if err != nil {
 			log.Println(color.RedString(err.Error()))
 			w.WriteHeader(http.StatusInternalServerError)
 			return http.StatusInternalServerError
 		}
-		w.Header().Set("Content-Type", contentType)
+		LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
+
+		if needRedirect {
+			urlRedirect := r.URL
+			q := urlRedirect.Query()
+			q.Set("s", sessionUuid)
+			q.Set("h", hash)
+			urlRedirect.RawQuery = q.Encode()
+			w.Header().Set("Location", urlRedirect.String())
+			w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.WriteHeader(http.StatusTemporaryRedirect)
+			return http.StatusTemporaryRedirect
+		}
+		contentType, found := LocalCache.Get(getCacheCtKey(sessionUuid))
+		if !found {
+			contentType = defaultContentType
+		}
+		LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
+		w.Header().Set("Content-Type", contentType.(string))
 		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		io.WriteString(w, out)
 		return http.StatusOK
-	} else if r.Method == http.MethodOptions {
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		return http.StatusUnauthorized
+	}
+}
+
+func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+	userTpl := r.FormValue(formKeyTemplate)
+
+	contentType := defaultContentType
+	if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
+		contentType = contentTypeRaw
+	}
+	hash := getHash()
+	out, err := gen.GenerateByTemplate(userTpl, hash, collection)
+	if err != nil {
+		log.Println(color.RedString(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return http.StatusInternalServerError
+	}
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	io.WriteString(w, out)
+	return http.StatusOK
+}
+
+func generateResp(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+	switch r.Method {
+	case http.MethodGet:
+		r.ParseForm()
+		return generateRespGetMethod(w, r, collection)
+	case http.MethodPost:
+		r.ParseForm()
+		return generateRespPostMethod(w, r, collection)
+	case http.MethodOptions:
 		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		io.WriteString(w, "")
 		return http.StatusOK
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return http.StatusMethodNotAllowed
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	return http.StatusMethodNotAllowed
 }
 
 func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
