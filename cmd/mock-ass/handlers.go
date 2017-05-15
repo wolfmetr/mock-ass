@@ -59,6 +59,13 @@ func getCacheCtKey(sessionUuid string) string {
 	return fmt.Sprintf("ct_%s", sessionUuid)
 }
 
+func getContentTypeFromCache(sessionUuid, fallback string) string {
+	if contentTypeRaw, found := LocalCache.Get(getCacheCtKey(sessionUuid)); found {
+		return contentTypeRaw.(string)
+	}
+	return fallback
+}
+
 func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
 	needRedirect := false
 	hash := r.FormValue("h")
@@ -75,15 +82,12 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 	} else {
 		if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
 			LocalCache.Set(getCacheHashKey(hash), result, defaultDataTtlMinutes)
-			contentType := defaultContentType
-			if contentTypeRaw, found := LocalCache.Get(getCacheCtKey(sessionUuid)); found {
-				contentType = contentTypeRaw.(string)
-			}
+
+			contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
 			LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
+
 			w.Header().Set("Content-Type", contentType)
-			w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			setCorsHeaders(w)
 			io.WriteString(w, result.(string))
 			return http.StatusOK
 		}
@@ -94,6 +98,7 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 		out, err := gen.GenerateByTemplate(userTpl, hash, collection)
 		if err != nil {
 			log.Println(color.RedString(err.Error()))
+
 			w.WriteHeader(http.StatusInternalServerError)
 			return http.StatusInternalServerError
 		}
@@ -105,22 +110,18 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 			q.Set("s", sessionUuid)
 			q.Set("h", hash)
 			urlRedirect.RawQuery = q.Encode()
+
 			w.Header().Set("Location", urlRedirect.String())
-			w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			setCorsHeaders(w)
 			w.WriteHeader(http.StatusTemporaryRedirect)
 			return http.StatusTemporaryRedirect
 		}
-		contentType, found := LocalCache.Get(getCacheCtKey(sessionUuid))
-		if !found {
-			contentType = defaultContentType
-		}
+
+		contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
 		LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
-		w.Header().Set("Content-Type", contentType.(string))
-		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+
+		w.Header().Set("Content-Type", contentType)
+		setCorsHeaders(w)
 		io.WriteString(w, out)
 		return http.StatusOK
 	} else {
@@ -143,10 +144,9 @@ func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *
 		w.WriteHeader(http.StatusInternalServerError)
 		return http.StatusInternalServerError
 	}
+
 	w.Header().Set("Content-Type", contentType)
-	w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setCorsHeaders(w)
 	io.WriteString(w, out)
 	return http.StatusOK
 }
@@ -160,9 +160,7 @@ func generateResp(w http.ResponseWriter, r *http.Request, collection *random_dat
 		r.ParseForm()
 		return generateRespPostMethod(w, r, collection)
 	case http.MethodOptions:
-		w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		setCorsHeaders(w)
 		io.WriteString(w, "")
 		return http.StatusOK
 	default:
@@ -171,49 +169,69 @@ func generateResp(w http.ResponseWriter, r *http.Request, collection *random_dat
 	}
 }
 
-func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
-	if r.Method == http.MethodPost {
-		r.ParseForm()
-		userTpl := r.FormValue(formKeyTemplate)
+func parseTtlMin(r *http.Request, fallback time.Duration) (ttl time.Duration, err error) {
+	ttl = fallback
 
-		contentType := defaultContentType
-		if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
-			contentType = contentTypeRaw
-		}
-
-		ttl := defaultSessionTtlMinutes
-		if ttlRaw := r.FormValue(formKeySessionTtlMin); ttlRaw != "" {
-			var err error
-			var ttlParsedInt int64
-			ttlParsedInt, err = strconv.ParseInt(ttlRaw, 10, 32)
-			if err != nil {
-				log.Println(color.RedString(err.Error()))
-				w.WriteHeader(http.StatusInternalServerError)
-				return http.StatusInternalServerError
-			}
-			ttl = time.Duration(ttlParsedInt) * time.Minute
-		}
-
-		sessionUuid := getHash()
-		cacheDataTtlTd := time.Minute * time.Duration(ttl)
-		LocalCache.Set(sessionUuid, userTpl, cacheDataTtlTd)
-		LocalCache.Set(getCacheCtKey(sessionUuid), contentType, cacheDataTtlTd)
-
-		sessionResp := &SessionResponse{
-			Session: sessionUuid,
-			Url:     fmt.Sprintf(sessionUrl, sessionUuid),
-		}
-
-		sessionRespJson, err := json.Marshal(sessionResp)
-		if err != nil {
-			log.Println(color.RedString(err.Error()))
-			return http.StatusInternalServerError
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(sessionRespJson)
-		return http.StatusOK
+	var ttlRaw string
+	if ttlRaw = r.FormValue(formKeySessionTtlMin); ttlRaw == "" {
+		return
 	}
 
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	return http.StatusMethodNotAllowed
+	var ttlParsedInt int64
+	ttlParsedInt, err = strconv.ParseInt(ttlRaw, 10, 64)
+	if err != nil {
+		return
+	}
+
+	ttl = time.Duration(ttlParsedInt) * time.Minute
+	return
+}
+
+func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return http.StatusMethodNotAllowed
+	}
+
+	r.ParseForm()
+
+	contentType := defaultContentType
+	if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
+		contentType = contentTypeRaw
+	}
+
+	ttl, err := parseTtlMin(r, defaultSessionTtlMinutes)
+	if err != nil {
+		log.Println(color.RedString(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return http.StatusInternalServerError
+	}
+
+	userTpl := r.FormValue(formKeyTemplate)
+	sessionUuid := getHash()
+
+	LocalCache.Set(sessionUuid, userTpl, ttl)
+	LocalCache.Set(getCacheCtKey(sessionUuid), contentType, ttl)
+
+	sessionResp := &SessionResponse{
+		Session: sessionUuid,
+		Url:     fmt.Sprintf(sessionUrl, sessionUuid),
+	}
+
+	sessionRespJson, err := json.Marshal(sessionResp)
+	if err != nil {
+		log.Println(color.RedString(err.Error()))
+		return http.StatusInternalServerError
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(sessionRespJson)
+	return http.StatusOK
+
+}
+
+func setCorsHeaders(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 }
