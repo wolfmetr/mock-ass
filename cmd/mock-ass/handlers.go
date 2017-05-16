@@ -66,6 +66,18 @@ func getContentTypeFromCache(sessionUuid, fallback string) string {
 	return fallback
 }
 
+func responseFromCache(w http.ResponseWriter, hash, result, sessionUuid string) int {
+	LocalCache.Set(getCacheHashKey(hash), result, defaultDataTtlMinutes)
+
+	contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
+	LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
+
+	w.Header().Set("Content-Type", contentType)
+	setCorsHeaders(w)
+	io.WriteString(w, result)
+	return http.StatusOK
+}
+
 func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
 	needRedirect := false
 	hash := r.FormValue("h")
@@ -81,15 +93,7 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 		needRedirect = true
 	} else {
 		if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
-			LocalCache.Set(getCacheHashKey(hash), result, defaultDataTtlMinutes)
-
-			contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
-			LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
-
-			w.Header().Set("Content-Type", contentType)
-			setCorsHeaders(w)
-			io.WriteString(w, result.(string))
-			return http.StatusOK
+			return responseFromCache(w, hash, result.(string), sessionUuid)
 		}
 	}
 
