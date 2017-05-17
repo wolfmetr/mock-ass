@@ -78,6 +78,19 @@ func responseFromCache(w http.ResponseWriter, hash, result, sessionUuid string) 
 	return http.StatusOK
 }
 
+func responseRedirect(w http.ResponseWriter, r *http.Request, sessionUuid, hash string) int {
+	urlRedirect := r.URL
+	q := urlRedirect.Query()
+	q.Set("s", sessionUuid)
+	q.Set("h", hash)
+	urlRedirect.RawQuery = q.Encode()
+
+	w.Header().Set("Location", urlRedirect.String())
+	setCorsHeaders(w)
+	w.WriteHeader(http.StatusTemporaryRedirect)
+	return http.StatusTemporaryRedirect
+}
+
 func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
 	needRedirect := false
 	hash := r.FormValue("h")
@@ -109,16 +122,7 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 		LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
 
 		if needRedirect {
-			urlRedirect := r.URL
-			q := urlRedirect.Query()
-			q.Set("s", sessionUuid)
-			q.Set("h", hash)
-			urlRedirect.RawQuery = q.Encode()
-
-			w.Header().Set("Location", urlRedirect.String())
-			setCorsHeaders(w)
-			w.WriteHeader(http.StatusTemporaryRedirect)
-			return http.StatusTemporaryRedirect
+			return responseRedirect(w, r, sessionUuid, hash)
 		}
 
 		contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
