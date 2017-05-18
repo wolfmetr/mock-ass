@@ -110,32 +110,34 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 		}
 	}
 
-	if userTplC, found := LocalCache.Get(sessionUuid); found {
-		userTpl := userTplC.(string)
-		out, err := gen.GenerateByTemplate(userTpl, hash, collection)
-		if err != nil {
-			log.Println(color.RedString(err.Error()))
-
-			w.WriteHeader(http.StatusInternalServerError)
-			return http.StatusInternalServerError
-		}
-		LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
-
-		if needRedirect {
-			return responseRedirect(w, r, sessionUuid, hash)
-		}
-
-		contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
-		LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
-
-		w.Header().Set("Content-Type", contentType)
-		setCorsHeaders(w)
-		io.WriteString(w, out)
-		return http.StatusOK
-	} else {
+	var found bool
+	var userTplC interface{}
+	if userTplC, found = LocalCache.Get(sessionUuid); !found {
 		w.WriteHeader(http.StatusBadRequest)
 		return http.StatusUnauthorized
 	}
+
+	userTpl := userTplC.(string)
+	out, err := gen.GenerateByTemplate(userTpl, hash, collection)
+	if err != nil {
+		log.Println(color.RedString(err.Error()))
+
+		w.WriteHeader(http.StatusInternalServerError)
+		return http.StatusInternalServerError
+	}
+	LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
+
+	if needRedirect {
+		return responseRedirect(w, r, sessionUuid, hash)
+	}
+
+	contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
+	LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
+
+	w.Header().Set("Content-Type", contentType)
+	setCorsHeaders(w)
+	io.WriteString(w, out)
+	return http.StatusOK
 }
 
 func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
