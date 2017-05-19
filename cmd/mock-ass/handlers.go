@@ -92,7 +92,6 @@ func responseRedirect(w http.ResponseWriter, r *http.Request, sessionUuid, hash 
 }
 
 func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
-	needRedirect := false
 	hash := r.FormValue("h")
 	sessionUuid := r.FormValue("s")
 	if sessionUuid == "" {
@@ -101,21 +100,24 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 		return http.StatusBadRequest
 	}
 
-	if hash == "" {
-		hash = getHash()
-		needRedirect = true
-	} else {
-		if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
-			return responseFromCache(w, hash, result.(string), sessionUuid)
-		}
-	}
-
 	var found bool
 	var userTplC interface{}
 	if userTplC, found = LocalCache.Get(sessionUuid); !found {
 		w.WriteHeader(http.StatusBadRequest)
 		return http.StatusUnauthorized
 	}
+	if hash != "" {
+		if result, found := LocalCache.Get(getCacheHashKey(hash)); found {
+			return responseFromCache(w, hash, result.(string), sessionUuid)
+		}
+		// TODO: invalid hash response?
+		w.WriteHeader(http.StatusBadRequest)
+		return http.StatusUnauthorized
+
+	}
+
+	// generate resp from template
+	hash = getHash()
 
 	userTpl := userTplC.(string)
 	out, err := gen.GenerateByTemplate(userTpl, hash, collection)
@@ -125,19 +127,11 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 		w.WriteHeader(http.StatusInternalServerError)
 		return http.StatusInternalServerError
 	}
+	// set resp to cache
 	LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
 
-	if needRedirect {
-		return responseRedirect(w, r, sessionUuid, hash)
-	}
-
-	contentType := getContentTypeFromCache(sessionUuid, defaultContentType)
-	LocalCache.Set(getCacheCtKey(sessionUuid), contentType, defaultDataTtlMinutes)
-
-	w.Header().Set("Content-Type", contentType)
-	setCorsHeaders(w)
-	io.WriteString(w, out)
-	return http.StatusOK
+	// and redirect to stable url
+	return responseRedirect(w, r, sessionUuid, hash)
 }
 
 func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
