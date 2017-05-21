@@ -1,4 +1,4 @@
-package gen
+package render
 
 import (
 	"github.com/wolfmetr/mock-ass/random_data"
@@ -14,7 +14,7 @@ func Range(size int) []int {
 	return sl
 }
 
-func GenerateByTemplate(template string, hash string, collection *random_data.RandomDataCollection) (out string, err error) {
+func Do(template string, hash string, collection *random_data.RandomDataCollection) (out string, err error) {
 	tpl, err := pongo2.FromString(template)
 	if err != nil {
 		return "", err

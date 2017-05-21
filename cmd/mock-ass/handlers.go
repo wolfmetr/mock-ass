@@ -6,11 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/wolfmetr/mock-ass/gen"
 	"github.com/wolfmetr/mock-ass/random_data"
+	"github.com/wolfmetr/mock-ass/render"
 
 	"github.com/fatih/color"
 	"github.com/pmylund/go-cache"
@@ -32,6 +31,13 @@ const (
 type SessionResponse struct {
 	Session string `json:"session"`
 	Url     string `json:"url"`
+}
+
+func newSessionResponse(sessionUuid string) *SessionResponse {
+	return &SessionResponse{
+		Session: sessionUuid,
+		Url:     fmt.Sprintf(sessionUrl, sessionUuid),
+	}
 }
 
 type ErrorResponse struct {
@@ -120,12 +126,9 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 	hash = getHash()
 
 	userTpl := userTplC.(string)
-	out, err := gen.GenerateByTemplate(userTpl, hash, collection)
+	out, err := render.Do(userTpl, hash, collection)
 	if err != nil {
-		log.Println(color.RedString(err.Error()))
-
-		w.WriteHeader(http.StatusInternalServerError)
-		return http.StatusInternalServerError
+		return respInternalServerError(w, err)
 	}
 	// set resp to cache
 	LocalCache.Set(getCacheHashKey(hash), out, defaultDataTtlMinutes)
@@ -136,17 +139,12 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 
 func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
 	userTpl := r.FormValue(formKeyTemplate)
+	contentType := parseContentType(r)
 
-	contentType := defaultContentType
-	if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
-		contentType = contentTypeRaw
-	}
 	hash := getHash()
-	out, err := gen.GenerateByTemplate(userTpl, hash, collection)
+	out, err := render.Do(userTpl, hash, collection)
 	if err != nil {
-		log.Println(color.RedString(err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		return http.StatusInternalServerError
+		return respInternalServerError(w, err)
 	}
 
 	w.Header().Set("Content-Type", contentType)
@@ -173,25 +171,7 @@ func generateResp(w http.ResponseWriter, r *http.Request, collection *random_dat
 	}
 }
 
-func parseTtlMin(r *http.Request, fallback time.Duration) (ttl time.Duration, err error) {
-	ttl = fallback
-
-	var ttlRaw string
-	if ttlRaw = r.FormValue(formKeySessionTtlMin); ttlRaw == "" {
-		return
-	}
-
-	var ttlParsedInt int64
-	ttlParsedInt, err = strconv.ParseInt(ttlRaw, 10, 64)
-	if err != nil {
-		return
-	}
-
-	ttl = time.Duration(ttlParsedInt) * time.Minute
-	return
-}
-
-func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
+func initSession(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return http.StatusMethodNotAllowed
@@ -199,33 +179,21 @@ func get_session(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDa
 
 	r.ParseForm()
 
-	contentType := defaultContentType
-	if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
-		contentType = contentTypeRaw
-	}
-
-	ttl, err := parseTtlMin(r, defaultSessionTtlMinutes)
-	if err != nil {
-		log.Println(color.RedString(err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		return http.StatusInternalServerError
-	}
-
+	contentType := parseContentType(r)
 	userTpl := r.FormValue(formKeyTemplate)
+	ttl, err := parseTtlMin(r)
+	if err != nil {
+		return respInternalServerError(w, err)
+	}
 	sessionUuid := getHash()
 
 	LocalCache.Set(sessionUuid, userTpl, ttl)
 	LocalCache.Set(getCacheCtKey(sessionUuid), contentType, ttl)
 
-	sessionResp := &SessionResponse{
-		Session: sessionUuid,
-		Url:     fmt.Sprintf(sessionUrl, sessionUuid),
-	}
-
+	sessionResp := newSessionResponse(sessionUuid)
 	sessionRespJson, err := json.Marshal(sessionResp)
 	if err != nil {
-		log.Println(color.RedString(err.Error()))
-		return http.StatusInternalServerError
+		return respInternalServerError(w, err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -238,4 +206,12 @@ func setCorsHeaders(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Headers", "X-Jquery-Json, Content-Type, Accept, Content-Length, Origin")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func respInternalServerError(w http.ResponseWriter, err error) int {
+	if err != nil {
+		log.Println(color.RedString(err.Error()))
+	}
+	w.WriteHeader(http.StatusInternalServerError)
+	return http.StatusInternalServerError
 }

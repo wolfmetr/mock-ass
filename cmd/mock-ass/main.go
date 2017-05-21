@@ -44,7 +44,7 @@ func main() {
 			},
 			Route{
 				path: "/init",
-				hand: get_session,
+				hand: initSession,
 			},
 		),
 	}
