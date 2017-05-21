@@ -1,6 +1,9 @@
 # mock-ass
 Mock HTTP responses with processed random data and a custom template
 
+
+[![Build Status](https://travis-ci.org/wolfmetr/mock-ass.png?branch=master)](https://travis-ci.org/wolfmetr/mock-ass)
+
 ### Installation
 ```bash
 $ go get github.com/wolfmetr/mock-ass
