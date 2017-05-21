@@ -8,8 +8,6 @@ import (
 	"os"
 
 	"github.com/wolfmetr/mock-ass/random_data"
-
-	"github.com/fatih/color"
 )
 
 var (
@@ -25,15 +23,12 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if !*flagColor {
-		color.NoColor = true
-	}
 
 	collection, err := random_data.InitCollectionFromPath(dataPath)
 	if err != nil {
-		log.Fatalf(color.RedString("InitCollectionFromPath error: %v", err))
+		log.Fatalf("InitCollectionFromPath error: %v", err)
 	}
-	log.Println(color.BlueString("Data collection successfully loaded"))
+	log.Println("Data collection successfully loaded")
 	server := http.Server{
 		Addr: fmt.Sprintf(":%d", *flagPort),
 		Handler: newAppHandler(
@@ -49,8 +44,8 @@ func main() {
 		),
 	}
 
-	log.Println(color.BlueString("Start server port %d", *flagPort))
+	log.Printf("Start server port %d", *flagPort)
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf(color.RedString("serve error: %v", err))
+		log.Fatalf("serve error: %v", err)
 	}
 }

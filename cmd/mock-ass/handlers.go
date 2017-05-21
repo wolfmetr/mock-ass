@@ -11,7 +11,6 @@ import (
 	"github.com/wolfmetr/mock-ass/random_data"
 	"github.com/wolfmetr/mock-ass/render"
 
-	"github.com/fatih/color"
 	"github.com/pmylund/go-cache"
 )
 
@@ -101,7 +100,7 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 	hash := r.FormValue("h")
 	sessionUuid := r.FormValue("s")
 	if sessionUuid == "" {
-		log.Println(color.RedString("session argument empty or not found"))
+		log.Println("session argument empty or not found")
 		w.WriteHeader(http.StatusBadRequest)
 		return http.StatusBadRequest
 	}
@@ -210,7 +209,7 @@ func setCorsHeaders(w http.ResponseWriter) {
 
 func respInternalServerError(w http.ResponseWriter, err error) int {
 	if err != nil {
-		log.Println(color.RedString(err.Error()))
+		log.Println(err.Error())
 	}
 	w.WriteHeader(http.StatusInternalServerError)
 	return http.StatusInternalServerError

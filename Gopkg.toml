@@ -53,10 +53,6 @@
 required = ["gopkg.in/check.v1"]
 
 [[dependencies]]
-  version = "v1.4.1"
-  name = "github.com/fatih/color"
-
-[[dependencies]]
   name = "github.com/pmylund/go-cache"
   version = "^2.0.0"
 

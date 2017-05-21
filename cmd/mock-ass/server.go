@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/wolfmetr/mock-ass/random_data"
 )
 
@@ -42,13 +41,13 @@ func (h *AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if route, ok := h.routes[r.URL.Path]; ok {
 		statusCode := route.hand(w, r, h.collection)
 		if statusCode >= http.StatusOK && statusCode < http.StatusMultipleChoices {
-			log.Println(color.GreenString("[%s] %s — %d", r.Method, r.URL.String(), statusCode))
+			log.Printf("[%s] %s — %d", r.Method, r.URL.String(), statusCode)
 		} else {
-			log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), statusCode))
+			log.Printf("[%s] %s — %d", r.Method, r.URL.String(), statusCode)
 		}
 		return
 	} else {
-		log.Println(color.RedString("[%s] %s — %d", r.Method, r.URL.String(), 404))
+		log.Printf("[%s] %s — %d", r.Method, r.URL.String(), 404)
 		http.NotFound(w, r)
 	}
 }
