@@ -29,9 +29,9 @@ func main() {
 		color.NoColor = true
 	}
 
-	collection, err := random_data.InitCollection(dataPath)
+	collection, err := random_data.InitCollectionFromPath(dataPath)
 	if err != nil {
-		log.Fatalf(color.RedString("InitCollection error: %v", err))
+		log.Fatalf(color.RedString("InitCollectionFromPath error: %v", err))
 	}
 	log.Println(color.BlueString("Data collection successfully loaded"))
 	server := http.Server{

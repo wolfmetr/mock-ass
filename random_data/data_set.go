@@ -126,14 +126,14 @@ func LoadParagraphsFromFile(filePath string) (paragraphs []string, err error) {
 
 // http://siteresources.worldbank.org/DATASTATISTICS/Resources/CLASS.XLS
 type RandomDataCollection struct {
-	Countries    []CountryType
-	Languages    []LanguageType
-	States       []StateType
-	FemaleNames  []string
-	MaleNames    []string
-	LastNames    []string
-	EmailDomains []string
-	Paragraphs   []string
+	countries    []CountryType
+	languages    []LanguageType
+	states       []StateType
+	femaleNames  []string
+	maleNames    []string
+	lastNames    []string
+	emailDomains []string
+	paragraphs   []string
 }
 
 // Default file names; reset if you need.
@@ -148,7 +148,7 @@ var (
 	TextsFile        string = "texts.json"
 )
 
-func InitCollection(dataPath string) (*RandomDataCollection, error) {
+func InitCollectionFromPath(dataPath string) (*RandomDataCollection, error) {
 	countries, err := LoadCountriesFromFile(filepath.Join(dataPath, CountriesFile))
 	if err != nil {
 		return nil, err
@@ -182,13 +182,16 @@ func InitCollection(dataPath string) (*RandomDataCollection, error) {
 		return nil, err
 	}
 	return &RandomDataCollection{
-		Countries:    countries,
-		Languages:    languages,
-		States:       states,
-		FemaleNames:  femaleNames,
-		MaleNames:    maleNames,
-		LastNames:    lastNames,
-		EmailDomains: emailDomains,
-		Paragraphs:   paragraphs,
+		countries:    countries,
+		languages:    languages,
+		states:       states,
+		femaleNames:  femaleNames,
+		maleNames:    maleNames,
+		lastNames:    lastNames,
+		emailDomains: emailDomains,
+		paragraphs:   paragraphs,
 	}, nil
 }
+
+// TODO: init from reader
+//func InitCollectionFromReaders
