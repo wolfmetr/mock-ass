@@ -25,7 +25,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if *flagColor == false {
+	if !*flagColor {
 		color.NoColor = true
 	}
 

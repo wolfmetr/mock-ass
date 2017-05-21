@@ -9,6 +9,13 @@ install:
   - dep ensure
   - make install
 
+before_script:
+  - PKGS=$(go list ./... | grep -v /vendor/ )
+  - go get -v honnef.co/go/tools/cmd/{gosimple,staticcheck}
+
 script:
   - make test
   - make test-vendor
+  - go vet $PKGS
+  - staticcheck $PKGS
+  - gosimple $PKGS

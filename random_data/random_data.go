@@ -109,10 +109,7 @@ func (rd *RandomData) getStateUsa(stateFormat int, src int64) string {
 
 func (rd *RandomData) getBoolean(src int64) bool {
 	r := rand.New(rand.NewSource(src))
-	if r.Intn(2)%2 > 0 {
-		return true
-	}
-	return false
+	return r.Intn(2)%2 > 0
 }
 
 func (rd *RandomData) getNumber(src int64, numberRange ...int) int {

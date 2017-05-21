@@ -7,7 +7,7 @@ import (
 )
 
 func Range(size int) []int {
-	sl := make([]int, size, size)
+	sl := make([]int, size)
 	for i := range sl {
 		sl[i] = i + 1
 	}
