@@ -6,14 +6,14 @@ Mock HTTP responses with processed random data and a custom template
 
 ### Installation
 ```bash
-$ go get github.com/wolfmetr/mock-ass
+$ go get github.com/wolfmetr/mock-ass/cmd/mock-ass
 ```
 
 ### Usage
 ```bash
 $ make run
 or
-$ ./mock-ass [-color] [-port=8000] 
+$ ./mock-ass [-port=8000] 
 ```
 
 to initialize session send POST request to `http://localhost:8000/init` with media-type `application/x-www-form-urlencoded`
