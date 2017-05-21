@@ -2,7 +2,7 @@
 Mock HTTP responses with processed random data and a custom template
 
 
-[![Build Status](https://travis-ci.org/wolfmetr/mock-ass.png?branch=master)](https://travis-ci.org/wolfmetr/mock-ass)
+[![Build Status](https://travis-ci.org/wolfmetr/mock-ass.svg?branch=master)](https://travis-ci.org/wolfmetr/mock-ass)
 
 ### Installation
 ```bash
