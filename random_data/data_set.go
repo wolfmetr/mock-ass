@@ -29,96 +29,136 @@ type StateType struct {
 }
 
 func LoadCountriesFromFile(filePath string) (countries []CountryType, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err = json.Unmarshal(file, &countries); err != nil {
+	countries, err = LoadCountriesFromBytes(b)
+	return
+}
+
+func LoadCountriesFromBytes(b []byte) (countries []CountryType, err error) {
+	if err := json.Unmarshal(b, &countries); err != nil {
 		return nil, err
 	}
 	return countries, nil
 }
 
 func LoadLanguagesFromFile(filePath string) (languages []LanguageType, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &languages); err != nil {
+	languages, err = LoadLanguagesFromBytes(b)
+	return
+}
+
+func LoadLanguagesFromBytes(b []byte) (languages []LanguageType, err error) {
+	if err := json.Unmarshal(b, &languages); err != nil {
 		return nil, err
 	}
 	return languages, nil
 }
 
 func LoadStatesFromFile(filePath string) (states []StateType, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &states); err != nil {
+	states, err = LoadStatesFromBytes(b)
+	return
+}
+
+func LoadStatesFromBytes(b []byte) (states []StateType, err error) {
+	if err := json.Unmarshal(b, &states); err != nil {
 		return nil, err
 	}
 	return states, nil
 }
 
 func LoadFemaleNamesFromFile(filePath string) (femaleNames []string, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &femaleNames); err != nil {
+	femaleNames, err = LoadFemaleNamesFromBytes(b)
+	return
+}
+
+func LoadFemaleNamesFromBytes(b []byte) (femaleNames []string, err error) {
+	if err := json.Unmarshal(b, &femaleNames); err != nil {
 		return nil, err
 	}
 	return femaleNames, nil
 }
 
 func LoadMaleNamesFromFile(filePath string) (maleNames []string, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &maleNames); err != nil {
+	maleNames, err = LoadMaleNamesFromBytes(b)
+	return
+}
+
+func LoadMaleNamesFromBytes(b []byte) (maleNames []string, err error) {
+	if err := json.Unmarshal(b, &maleNames); err != nil {
 		return nil, err
 	}
 	return maleNames, nil
 }
 
 func LoadLastNamesFromFile(filePath string) (lastNames []string, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &lastNames); err != nil {
+	lastNames, err = LoadLastNamesFromBytes(b)
+	return
+}
+
+func LoadLastNamesFromBytes(b []byte) (lastNames []string, err error) {
+	if err := json.Unmarshal(b, &lastNames); err != nil {
 		return nil, err
 	}
 	return lastNames, nil
 }
 
 func LoadEmailDomainsFromFile(filePath string) (emailDomains []string, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &emailDomains); err != nil {
+	emailDomains, err = LoadEmailDomainsFromBytes(b)
+	return
+}
+
+func LoadEmailDomainsFromBytes(b []byte) (emailDomains []string, err error) {
+	if err := json.Unmarshal(b, &emailDomains); err != nil {
 		return nil, err
 	}
 	return emailDomains, nil
 }
 
 func LoadParagraphsFromFile(filePath string) (paragraphs []string, err error) {
-	var file []byte
-	file, err = ioutil.ReadFile(filePath)
+	var b []byte
+	b, err = ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(file, &paragraphs); err != nil {
+	paragraphs, err = LoadParagraphsFromBytes(b)
+	return paragraphs, nil
+}
+
+func LoadParagraphsFromBytes(b []byte) (paragraphs []string, err error) {
+	if err := json.Unmarshal(b, &paragraphs); err != nil {
 		return nil, err
 	}
 	return paragraphs, nil
@@ -145,7 +185,7 @@ var (
 	MaleNamesFile    string = "male_names.json"
 	LastNamesFile    string = "last_names.json"
 	EmailDomainsFile string = "email_domains.json"
-	TextsFile        string = "texts.json"
+	ParagraphsFile   string = "texts.json"
 )
 
 func InitCollectionFromPath(dataPath string) (*RandomDataCollection, error) {
@@ -177,7 +217,7 @@ func InitCollectionFromPath(dataPath string) (*RandomDataCollection, error) {
 	if err != nil {
 		return nil, err
 	}
-	paragraphs, err := LoadParagraphsFromFile(filepath.Join(dataPath, TextsFile))
+	paragraphs, err := LoadParagraphsFromFile(filepath.Join(dataPath, ParagraphsFile))
 	if err != nil {
 		return nil, err
 	}
@@ -193,5 +233,47 @@ func InitCollectionFromPath(dataPath string) (*RandomDataCollection, error) {
 	}, nil
 }
 
-// TODO: init from reader
-//func InitCollectionFromReaders
+func InitCollectionFromBytes(countriesBytes, languagesBytes, statesBytes, femaleNamesBytes, maleNamesBytes, lastNamesBytes, emailDomainsBytes, paragraphsBytes []byte) (*RandomDataCollection, error) {
+	countries, err := LoadCountriesFromBytes(countriesBytes)
+	if err != nil {
+		return nil, err
+	}
+	languages, err := LoadLanguagesFromBytes(languagesBytes)
+	if err != nil {
+		return nil, err
+	}
+	states, err := LoadStatesFromBytes(statesBytes)
+	if err != nil {
+		return nil, err
+	}
+	femaleNames, err := LoadFemaleNamesFromBytes(femaleNamesBytes)
+	if err != nil {
+		return nil, err
+	}
+	maleNames, err := LoadMaleNamesFromBytes(maleNamesBytes)
+	if err != nil {
+		return nil, err
+	}
+	lastNames, err := LoadLastNamesFromBytes(lastNamesBytes)
+	if err != nil {
+		return nil, err
+	}
+	emailDomains, err := LoadEmailDomainsFromBytes(emailDomainsBytes)
+	if err != nil {
+		return nil, err
+	}
+	paragraphs, err := LoadParagraphsFromBytes(paragraphsBytes)
+	if err != nil {
+		return nil, err
+	}
+	return &RandomDataCollection{
+		countries:    countries,
+		languages:    languages,
+		states:       states,
+		femaleNames:  femaleNames,
+		maleNames:    maleNames,
+		lastNames:    lastNames,
+		emailDomains: emailDomains,
+		paragraphs:   paragraphs,
+	}, nil
+}
