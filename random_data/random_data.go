@@ -27,11 +27,10 @@ const (
 	StateUsaNameFormat
 )
 
+var crc64Table = crc64.MakeTable(crc64.ISO)
+
 func stringToInt64(str string) int64 {
-	buf := []byte(str)
-	hash_tbl := crc64.MakeTable(crc64.ISO)
-	res := int64(crc64.Checksum(buf, hash_tbl))
-	return res
+	return int64(crc64.Checksum([]byte(str), crc64Table))
 }
 
 type RandomData struct {
@@ -53,21 +52,21 @@ func (rd *RandomData) getFirstName(gender int, src int64) string {
 	r := rand.New(rand.NewSource(src))
 	switch gender {
 	case Male:
-		return rd.collection.maleNames[r.Intn(len(rd.collection.maleNames))]
+		return rd.collection.MaleName(r)
 	case Female:
-		return rd.collection.femaleNames[r.Intn(len(rd.collection.femaleNames))]
+		return rd.collection.FemaleName(r)
 	default:
 		if rd.getBoolean(src) {
-			return rd.collection.maleNames[r.Intn(len(rd.collection.maleNames))]
+			return rd.collection.MaleName(r)
 		} else {
-			return rd.collection.femaleNames[r.Intn(len(rd.collection.femaleNames))]
+			return rd.collection.FemaleName(r)
 		}
 	}
 }
 
 func (rd *RandomData) getLastName(src int64) string {
 	r := rand.New(rand.NewSource(src))
-	return rd.collection.lastNames[r.Intn(len(rd.collection.lastNames))]
+	return rd.collection.LastName(r)
 }
 
 func (rd *RandomData) getEmail(src int64) string {
@@ -75,36 +74,35 @@ func (rd *RandomData) getEmail(src int64) string {
 	return fmt.Sprintf("%s.%s.example@%s",
 		strings.ToLower(rd.FirstName()),
 		strings.ToLower(rd.LastName()),
-		rd.collection.emailDomains[r.Intn(len(rd.collection.emailDomains))])
+		rd.collection.EmailDomain(r))
 }
 
 func (rd *RandomData) getCity(src int64) string {
 	r := rand.New(rand.NewSource(src))
-	return rd.collection.countries[r.Intn(len(rd.collection.countries))].Capital
+	return rd.collection.Country(r).Capital
 }
 
 func (rd *RandomData) getCountry(formatCountry int, src int64) string {
 	r := rand.New(rand.NewSource(src))
 	switch formatCountry {
-	case CountryNameFormat:
-		return rd.collection.countries[r.Intn(len(rd.collection.countries))].Name.Official
 	case CountryCode2Format:
-		return rd.collection.countries[r.Intn(len(rd.collection.countries))].CountryCode2
+		return rd.collection.Country(r).CountryCode2
 	case CountryCode3Format:
-		return rd.collection.countries[r.Intn(len(rd.collection.countries))].CountryCode3
+		return rd.collection.Country(r).CountryCode3
+	default: // CountryNameFormat
+		return rd.collection.Country(r).Name.Official
 	}
-	return rd.collection.countries[r.Intn(len(rd.collection.countries))].Name.Official
 }
 
 func (rd *RandomData) getStateUsa(stateFormat int, src int64) string {
 	r := rand.New(rand.NewSource(src))
 	switch stateFormat {
 	case StateUsaCodeFormat:
-		return rd.collection.states[r.Intn(len(rd.collection.states))].Code
+		return rd.collection.State(r).Code
 	case StateUsaNameFormat:
-		return rd.collection.states[r.Intn(len(rd.collection.states))].State
+		return rd.collection.State(r).State
 	}
-	return rd.collection.states[r.Intn(len(rd.collection.states))].State
+	return rd.collection.State(r).State
 }
 
 func (rd *RandomData) getBoolean(src int64) bool {

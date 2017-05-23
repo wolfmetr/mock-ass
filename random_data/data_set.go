@@ -3,6 +3,7 @@ package random_data
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math/rand"
 	"path/filepath"
 )
 
@@ -154,7 +155,7 @@ func LoadParagraphsFromFile(filePath string) (paragraphs []string, err error) {
 		return nil, err
 	}
 	paragraphs, err = LoadParagraphsFromBytes(b)
-	return paragraphs, nil
+	return
 }
 
 func LoadParagraphsFromBytes(b []byte) (paragraphs []string, err error) {
@@ -174,6 +175,34 @@ type RandomDataCollection struct {
 	lastNames    []string
 	emailDomains []string
 	paragraphs   []string
+}
+
+func (rdc *RandomDataCollection) Country(r *rand.Rand) *CountryType {
+	return &rdc.countries[r.Intn(len(rdc.countries))]
+}
+
+func (rdc *RandomDataCollection) EmailDomain(r *rand.Rand) string {
+	return rdc.emailDomains[r.Intn(len(rdc.emailDomains))]
+}
+
+func (rdc *RandomDataCollection) Language(r *rand.Rand) *LanguageType {
+	return &rdc.languages[r.Intn(len(rdc.languages))]
+}
+
+func (rdc *RandomDataCollection) State(r *rand.Rand) *StateType {
+	return &rdc.states[r.Intn(len(rdc.states))]
+}
+
+func (rdc *RandomDataCollection) MaleName(r *rand.Rand) string {
+	return rdc.maleNames[r.Intn(len(rdc.maleNames))]
+}
+
+func (rdc *RandomDataCollection) FemaleName(r *rand.Rand) string {
+	return rdc.femaleNames[r.Intn(len(rdc.femaleNames))]
+}
+
+func (rdc *RandomDataCollection) LastName(r *rand.Rand) string {
+	return rdc.lastNames[r.Intn(len(rdc.lastNames))]
 }
 
 // Default file names; reset if you need.
