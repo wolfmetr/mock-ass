@@ -1,6 +1,7 @@
 package random_data
 
 import (
+	"fmt"
 	"math/rand"
 	"path/filepath"
 )
@@ -79,38 +80,40 @@ var (
 	ParagraphsFile   string = "texts.json"
 )
 
+const errLoadFmt = "error on load %s: %v"
+
 func InitCollectionFromPath(dataPath string) (*RandomDataCollection, error) {
 	countries, err := LoadCountriesFromFile(filepath.Join(dataPath, CountriesFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, CountriesFile, err)
 	}
 	languages, err := LoadLanguagesFromFile(filepath.Join(dataPath, LanguagesFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, LanguagesFile, err)
 	}
 	states, err := LoadStatesFromFile(filepath.Join(dataPath, StatesFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, StatesFile, err)
 	}
 	femaleNames, err := LoadFemaleNamesFromFile(filepath.Join(dataPath, FemaleNamesFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, FemaleNamesFile, err)
 	}
 	maleNames, err := LoadMaleNamesFromFile(filepath.Join(dataPath, MaleNamesFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, MaleNamesFile, err)
 	}
 	lastNames, err := LoadLastNamesFromFile(filepath.Join(dataPath, LastNamesFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, LastNamesFile, err)
 	}
 	emailDomains, err := LoadEmailDomainsFromFile(filepath.Join(dataPath, EmailDomainsFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, EmailDomainsFile, err)
 	}
 	paragraphs, err := LoadParagraphsFromFile(filepath.Join(dataPath, ParagraphsFile))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, ParagraphsFile, err)
 	}
 	return &RandomDataCollection{
 		countries:    countries,
@@ -127,35 +130,35 @@ func InitCollectionFromPath(dataPath string) (*RandomDataCollection, error) {
 func InitCollectionFromBytes(countriesBytes, languagesBytes, statesBytes, femaleNamesBytes, maleNamesBytes, lastNamesBytes, emailDomainsBytes, paragraphsBytes []byte) (*RandomDataCollection, error) {
 	countries, err := LoadCountriesFromBytes(countriesBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "countries", err)
 	}
 	languages, err := LoadLanguagesFromBytes(languagesBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "languages", err)
 	}
 	states, err := LoadStatesFromBytes(statesBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "states", err)
 	}
 	femaleNames, err := LoadFemaleNamesFromBytes(femaleNamesBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "femaleNames", err)
 	}
 	maleNames, err := LoadMaleNamesFromBytes(maleNamesBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "maleNames", err)
 	}
 	lastNames, err := LoadLastNamesFromBytes(lastNamesBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "lastNames", err)
 	}
 	emailDomains, err := LoadEmailDomainsFromBytes(emailDomainsBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "emailDomains", err)
 	}
 	paragraphs, err := LoadParagraphsFromBytes(paragraphsBytes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(errLoadFmt, "paragraphs", err)
 	}
 	return &RandomDataCollection{
 		countries:    countries,
