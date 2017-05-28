@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/wolfmetr/mock-ass/random_data"
-	"github.com/wolfmetr/mock-ass/render"
 
 	"github.com/pmylund/go-cache"
 )
@@ -125,7 +124,7 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 	hash = getHash()
 
 	userTpl := userTplC.(string)
-	out, err := render.Do(userTpl, hash, collection)
+	out, err := random_data.Render(userTpl, hash, collection)
 	if err != nil {
 		return respInternalServerError(w, err)
 	}
@@ -141,7 +140,7 @@ func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *
 	contentType := parseContentType(r)
 
 	hash := getHash()
-	out, err := render.Do(userTpl, hash, collection)
+	out, err := random_data.Render(userTpl, hash, collection)
 	if err != nil {
 		return respInternalServerError(w, err)
 	}

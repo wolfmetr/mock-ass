@@ -1,8 +1,6 @@
-package render
+package random_data
 
 import (
-	"github.com/wolfmetr/mock-ass/random_data"
-
 	"gopkg.in/flosch/pongo2.v3"
 )
 
@@ -14,12 +12,12 @@ func Range(size int) []int {
 	return sl
 }
 
-func Do(template string, hash string, collection *random_data.RandomDataCollection) (out string, err error) {
+func Render(template string, hash string, collection *RandomDataCollection) (out string, err error) {
 	tpl, err := pongo2.FromString(template)
 	if err != nil {
 		return "", err
 	}
-	rd := random_data.NewRandomData(hash, collection)
+	rd := NewRandomData(hash, collection)
 	out, err = tpl.Execute(pongo2.Context{
 		"FirstName":               rd.FirstName,
 		"FirstNameChain":          rd.FirstNameChain,

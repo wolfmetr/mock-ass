@@ -9,9 +9,9 @@ import (
 
 func TestWorkingDirectory(t *testing.T) {
 	wd, _ := os.Getwd()
-	t.Log(wd)
-
 	path := filepath.Join(wd, "testdata")
+
+	t.Logf("init testdata from %s", path)
 	c, err := InitCollectionFromPath(path)
 	if err != nil {
 		t.Fatalf("error on InitCollectionFromPath: %v", err)
