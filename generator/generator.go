@@ -1,4 +1,4 @@
-package random_data
+package generator
 
 import (
 	"gopkg.in/flosch/pongo2.v3"

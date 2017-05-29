@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/wolfmetr/mock-ass/random_data"
+	"github.com/wolfmetr/mock-ass/generator"
 )
 
-type HandlerFunc func(http.ResponseWriter, *http.Request, *random_data.RandomDataCollection) (respCode int)
+type HandlerFunc func(http.ResponseWriter, *http.Request, *generator.RandomDataCollection) (respCode int)
 
 type Route struct {
 	path string
@@ -17,10 +17,10 @@ type Route struct {
 
 type AppHandler struct {
 	routes     map[string]Route
-	collection *random_data.RandomDataCollection
+	collection *generator.RandomDataCollection
 }
 
-func newAppHandler(collection *random_data.RandomDataCollection, routes ...Route) *AppHandler {
+func newAppHandler(collection *generator.RandomDataCollection, routes ...Route) *AppHandler {
 	h := new(AppHandler)
 	h.routes = make(map[string]Route, len(routes))
 	h.collection = collection

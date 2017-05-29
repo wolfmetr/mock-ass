@@ -1,4 +1,4 @@
-package random_data
+package generator
 
 import (
 	"fmt"

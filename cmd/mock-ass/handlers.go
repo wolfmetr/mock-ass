@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/wolfmetr/mock-ass/random_data"
+	"github.com/wolfmetr/mock-ass/generator"
 
 	"github.com/pmylund/go-cache"
 )
@@ -95,7 +95,7 @@ func responseRedirect(w http.ResponseWriter, r *http.Request, sessionUuid, hash 
 	return http.StatusTemporaryRedirect
 }
 
-func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *generator.RandomDataCollection) int {
 	hash := r.FormValue("h")
 	sessionUuid := r.FormValue("s")
 	if sessionUuid == "" {
@@ -124,7 +124,7 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 	hash = getHash()
 
 	userTpl := userTplC.(string)
-	out, err := random_data.Render(userTpl, hash, collection)
+	out, err := generator.Render(userTpl, hash, collection)
 	if err != nil {
 		return respInternalServerError(w, err)
 	}
@@ -135,12 +135,12 @@ func generateRespGetMethod(w http.ResponseWriter, r *http.Request, collection *r
 	return responseRedirect(w, r, sessionUuid, hash)
 }
 
-func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *generator.RandomDataCollection) int {
 	userTpl := r.FormValue(formKeyTemplate)
 	contentType := parseContentType(r)
 
 	hash := getHash()
-	out, err := random_data.Render(userTpl, hash, collection)
+	out, err := generator.Render(userTpl, hash, collection)
 	if err != nil {
 		return respInternalServerError(w, err)
 	}
@@ -151,7 +151,7 @@ func generateRespPostMethod(w http.ResponseWriter, r *http.Request, collection *
 	return http.StatusOK
 }
 
-func generateResp(w http.ResponseWriter, r *http.Request, collection *random_data.RandomDataCollection) int {
+func generateResp(w http.ResponseWriter, r *http.Request, collection *generator.RandomDataCollection) int {
 	switch r.Method {
 	case http.MethodGet:
 		r.ParseForm()
@@ -169,7 +169,7 @@ func generateResp(w http.ResponseWriter, r *http.Request, collection *random_dat
 	}
 }
 
-func initSession(w http.ResponseWriter, r *http.Request, _ *random_data.RandomDataCollection) int {
+func initSession(w http.ResponseWriter, r *http.Request, _ *generator.RandomDataCollection) int {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return http.StatusMethodNotAllowed

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/wolfmetr/mock-ass/random_data"
+	"github.com/wolfmetr/mock-ass/generator"
 )
 
 var (
@@ -24,7 +24,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	collection, err := random_data.InitCollectionFromPath(dataPath)
+	collection, err := generator.InitCollectionFromPath(dataPath)
 	if err != nil {
 		log.Fatalf("InitCollectionFromPath error: %v", err)
 	}
