@@ -1,13 +1,14 @@
 package generator
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
-var testTpl = `{
+var testTemplate = `{
     "first_name": "{{ FirstName() }}",
     "last_name": "{{ LastName() }}",
     "full_name": "{{ FullName() }}",
@@ -43,10 +44,34 @@ func TestRender(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Got err %+v", err)
 	}
-	out, err := Render(testTpl, "tet hash", collection)
+	out, err := Render(testTemplate, "tet hash", collection)
 	if err != nil {
 		t.Fatalf("Got err %+v", err)
 	}
 
 	fmt.Println(out)
+
+	var parsedTpl testTpl
+	err = json.Unmarshal([]byte(out), &parsedTpl)
+	if err != nil {
+		t.Fatalf("Got err %+v", err)
+	}
+
+	if parsedTpl.FirstName == "" {
+		t.Error("FirstName is empty")
+	}
+
+	if parsedTpl.LastName == "" {
+		t.Error("LastName is empty")
+	}
+
+	if parsedTpl.EmptyField != "" {
+		t.Error("EmptyField is not empty")
+	}
+}
+
+type testTpl struct {
+	EmptyField string `json:"empty_field"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
 }
