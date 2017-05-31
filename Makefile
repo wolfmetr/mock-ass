@@ -16,4 +16,8 @@ test-v:
 	make test ARGS=-v
 
 test-vendor:
-	go test -race ./vendor/...
+	go test -race ./vendor/... ${ARGS}
+
+test-vendor-v:
+	make test-vendor ARGS=-v
+

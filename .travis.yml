@@ -12,8 +12,8 @@ before_script:
   - go get -v honnef.co/go/tools/cmd/{gosimple,staticcheck}
 
 script:
-  - make test
-  - make test-vendor
+  - make test-v
+  - make test-vendor-v
   - go vet $PKGS
   - staticcheck $PKGS
   - gosimple $PKGS
