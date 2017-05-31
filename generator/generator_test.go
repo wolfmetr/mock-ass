@@ -2,13 +2,25 @@ package generator
 
 import (
 	"encoding/json"
-	"fmt"
+	"encoding/xml"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
-var testTemplate = `{
+func initTestCollection(t *testing.T) *RandomDataCollection {
+	wd, _ := os.Getwd()
+	path := filepath.Join(wd, "testdata")
+
+	t.Logf("init testdata from %s", path)
+	collection, err := InitCollectionFromPath(path)
+	if err != nil {
+		t.Fatalf("Got err %+v", err)
+	}
+	return collection
+}
+
+var testTemplateJson = `{
     "first_name": "{{ FirstName() }}",
     "last_name": "{{ LastName() }}",
     "full_name": "{{ FullName() }}",
@@ -35,23 +47,23 @@ var testTemplate = `{
     ]
 }`
 
-func TestRender(t *testing.T) {
-	wd, _ := os.Getwd()
-	path := filepath.Join(wd, "testdata")
+type testTplJson struct {
+	EmptyField string `json:"empty_field"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+}
 
-	t.Logf("init testdata from %s", path)
-	collection, err := InitCollectionFromPath(path)
+func TestRenderJson(t *testing.T) {
+	collection := initTestCollection(t)
+
+	out, err := Render(testTemplateJson, "tet hash", collection)
 	if err != nil {
 		t.Fatalf("Got err %+v", err)
 	}
-	out, err := Render(testTemplate, "tet hash", collection)
-	if err != nil {
-		t.Fatalf("Got err %+v", err)
-	}
 
-	fmt.Println(out)
+	t.Log(out)
 
-	var parsedTpl testTpl
+	var parsedTpl testTplJson
 	err = json.Unmarshal([]byte(out), &parsedTpl)
 	if err != nil {
 		t.Fatalf("Got err %+v", err)
@@ -70,8 +82,76 @@ func TestRender(t *testing.T) {
 	}
 }
 
-type testTpl struct {
-	EmptyField string `json:"empty_field"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
+var testTemplateXml = `
+	<Person>
+		<FullName>{{ FullName() }}</FullName>
+		<Company>Example Inc.</Company>
+		<Email where="home">
+			<Addr>{{ Email() }}</Addr>
+		</Email>
+		<Email where='work'>
+			<Addr>{{ Email() }}</Addr>
+		</Email>
+		<Group>
+			<Value>Friends</Value>
+			<Value>Squash</Value>
+		</Group>
+		<City>{{ City() }}</City>
+		<State>{{ StateUsaName() }}</State>
+	</Person>
+`
+
+type testTplXmlEmail struct {
+	Where string `xml:"where,attr"`
+	Addr  string
+}
+type testTplXmlAddress struct {
+	City, State string
+}
+type testTplXml struct {
+	XMLName xml.Name `xml:"Person"`
+	Name    string   `xml:"FullName"`
+	Phone   string
+	Email   []testTplXmlEmail
+	Groups  []string `xml:"Group>Value"`
+	testTplXmlAddress
+}
+
+func TestRenderXml(t *testing.T) {
+	collection := initTestCollection(t)
+
+	out, err := Render(testTemplateXml, "tet hash", collection)
+	if err != nil {
+		t.Fatalf("Got err %+v", err)
+	}
+
+	t.Log(out)
+
+	var parsedTpl testTplXml
+	err = xml.Unmarshal([]byte(out), &parsedTpl)
+	if err != nil {
+		t.Fatalf("Got err %+v", err)
+	}
+
+	if parsedTpl.XMLName.Local != "Person" {
+		t.Error("XMLName is not Person")
+	}
+
+	if parsedTpl.Name == "" {
+		t.Error("Name is empty")
+	}
+
+	if parsedTpl.City == "" {
+		t.Error("City is empty")
+	}
+
+	if parsedTpl.State == "" {
+		t.Error("State is empty")
+	}
+
+	for _, email := range parsedTpl.Email {
+		if email.Addr == "" {
+			t.Error("email is empty")
+		}
+	}
 }
