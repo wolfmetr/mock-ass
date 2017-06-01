@@ -63,6 +63,7 @@ func ExampleRender() {
 		panic(err)
 	}
 
+	// fmt.Println(out) // true random render
 	fmt.Printf("parsedTpl: %+v", parsedTpl)
 
 	// Output:
