@@ -9,7 +9,7 @@ import (
 func parseTtlMin(r *http.Request) (time.Duration, error) {
 	var err error
 	var ttlRaw string
-	if ttlRaw = r.FormValue(formKeySessionTtlMin); ttlRaw == "" {
+	if ttlRaw = r.URL.Query().Get(formKeySessionTtlMin); ttlRaw == "" {
 		return defaultSessionTtlMinutes, nil
 	}
 
@@ -24,7 +24,7 @@ func parseTtlMin(r *http.Request) (time.Duration, error) {
 }
 
 func parseContentType(r *http.Request) string {
-	if contentTypeRaw := r.FormValue(formKeyContentType); contentTypeRaw != "" {
+	if contentTypeRaw := r.URL.Query().Get(formKeyContentType); contentTypeRaw != "" {
 		return contentTypeRaw
 	}
 	return defaultContentType

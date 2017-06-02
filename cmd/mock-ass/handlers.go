@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -178,14 +179,19 @@ func initSession(w http.ResponseWriter, r *http.Request, _ *generator.RandomData
 	r.ParseForm()
 
 	contentType := parseContentType(r)
-	userTpl := r.FormValue(formKeyTemplate)
+	userTpl, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return respInternalServerError(w, err)
+	}
+	defer r.Body.Close()
+
 	ttl, err := parseTtlMin(r)
 	if err != nil {
 		return respInternalServerError(w, err)
 	}
 	sessionUuid := getHash()
 
-	LocalCache.Set(sessionUuid, userTpl, ttl)
+	LocalCache.Set(sessionUuid, string(userTpl), ttl)
 	LocalCache.Set(getCacheCtKey(sessionUuid), contentType, ttl)
 
 	sessionResp := newSessionResponse(sessionUuid)

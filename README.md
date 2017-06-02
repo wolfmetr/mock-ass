@@ -16,36 +16,37 @@ or
 $ ./mock-ass [-port=8000] 
 ```
 
-to initialize session send POST request to `http://localhost:8000/init` with media-type `application/x-www-form-urlencoded`
-```
-template: {
-            "first_name": "{{ FirstName() }}",
-            "last_name": "{{ LastName() }}",
-            "full_name": "{{ FullName() }}",
-            "city": "{{ City() }}",
-            "country": "{{ FullCountry() }}",
-            "country2": "{{ TwoLetterCountry() }}",
-            "country3": "{{ ThreeLetterCountry() }}",
-            "isActive": {{ BooleanString() }},
-            "float": {{ Float(12) }},
-            "float2": {{ Float(10, 15) }},
-            "float3": {{ Float(10, 15, 2) }},
-            "float4": {{ Float(10, 15, 3) }},
-            "ip_v4": "{{ IPv4() }}", 
-            "person": [
-                {% for x in Range(5) %}
-                {
-                    "first_name": "{{ FirstNameChain(forloop.Counter0) }}",
-                    "last_name": "{{ LastNameChain(forloop.Counter0) }}",
-                    "full_name": "{{ FullNameChain(forloop.Counter0) }}",
-                    "age": {{ Number(10, 100) }},
-                    "email": "{{ Email() }}"
-                }{% if not forloop.Last %}, {% endif %}
-                {% endfor %}
-            ]
-        }
-session_ttl_min: 15 (optianal field)
-content_type: application/json (optional field)
+to initialize session send POST request to `http://localhost:8000/init`
+```curl
+curl -X POST \
+  'http://localhost:8000/init/?content_type=application%2Fjson&session_ttl_min=13' \
+  -H 'content-type: text/plain' \
+  -d '{
+        "first_name": "{{ FirstName() }}",
+        "last_name": "{{ LastName() }}",
+        "full_name": "{{ FullName() }}",
+        "city": "{{ City() }}",
+        "country": "{{ FullCountry() }}",
+        "country2": "{{ TwoLetterCountry() }}",
+        "country3": "{{ ThreeLetterCountry() }}",
+        "isActive": {{ BooleanString() }},
+        "float": {{ Float(12) }},
+        "float2": {{ Float(10, 15) }},
+        "float3": {{ Float(10, 15, 2) }},
+        "float4": {{ Float(10, 15, 3) }},
+        "ip_v4": "{{ IPv4() }}", 
+        "person": [
+            {% for x in Range(5) %}
+            {
+                "first_name": "{{ FirstNameChain(forloop.Counter0) }}",
+                "last_name": "{{ LastNameChain(forloop.Counter0) }}",
+                "full_name": "{{ FullNameChain(forloop.Counter0) }}",
+                "age": {{ Number(10, 100) }},
+                "email": "{{ Email() }}"
+            }{% if not forloop.Last %}, {% endif %}
+            {% endfor %}
+        ]
+    }'
 ```
 and get response like
 ```json
