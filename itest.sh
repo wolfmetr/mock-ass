@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 make run 2> server.log & tail -f server.log | while read LOGLINE
 do
