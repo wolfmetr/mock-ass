@@ -21,3 +21,6 @@ test-vendor:
 test-vendor-v:
 	make test-vendor ARGS=-v
 
+itest:
+	./itest.sh & make run
+

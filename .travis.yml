@@ -17,3 +17,4 @@ script:
   - go vet $PKGS
   - staticcheck $PKGS
   - gosimple $PKGS
+  - make itest
