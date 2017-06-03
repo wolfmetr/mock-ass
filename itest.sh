@@ -1,8 +1,19 @@
 #!/bin/sh
 
+make run 2> server.log & tail -f server.log | while read LOGLINE
+do
+    found=$(echo "${LOGLINE}" | grep -m 1 -q "Start server")
+     if echo $LOGLINE | grep -m 1 -q "Start server"; then
+        pkill -P $$ tail
+     fi
+done
+rm server.log
+
+
+trap "killall -v mock-ass" EXIT
 host="http://localhost:8000"
 
-SESSINIT=$(curl -X POST \
+SESSINIT=$(curl -s -X POST \
   $( printf "$host/init/?content_type=application/json&session_ttl_min=13" ) \
   -H 'content-type: text/plain' \
   -d '{
@@ -31,6 +42,11 @@ SESSINIT=$(curl -X POST \
             {% endfor %}
         ]
     }')
+
+if [ -z "$SESSINIT" ]; then
+    echo "Response is empty"
+    exit 1
+fi
 
 echo "Init response = $SESSINIT"
 session_path=$(echo "$SESSINIT" | grep -o '"url":"[^"]*' | cut -s -f 4 -d '"')
