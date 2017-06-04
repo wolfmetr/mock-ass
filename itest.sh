@@ -53,10 +53,13 @@ session_path=$(echo "$SESSINIT" | grep -o '"url":"[^"]*' | cut -s -f 4 -d '"')
 echo "Parsed session_path = $session_path"
 
 REQ=$( printf "$host$session_path" )
-echo "Get rendered tempalte url: $REQ"
+echo "Get rendered template url: $REQ"
 RESULT=$(curl -s -L $REQ)
+if [ -z "$RESULT" ]; then
+    echo "Response is empty"
+    exit 1
+fi
 echo "Rendered template: \n$RESULT"
-
 
 ip=$(echo "$RESULT" | grep -o '"ip_v4": "[^"]*' | cut -s -f 4 -d '"')
 
